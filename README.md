@@ -26,7 +26,7 @@ rapor-karakter/
 ## Apps
 
 ### Builder — `localhost:3000`
-The admin-facing editor. Teachers and school staff use this to:
+The admin-facing editor. Runs **locally only** — not deployed. Teachers use this to:
 - Design report card templates with drag-and-drop blocks (`/reportCreator`)
 - Create SurveyJS questionnaire forms (`/formCreator`)
 
@@ -131,3 +131,29 @@ npm run dev        # → http://localhost:3000
 1. Branch from `main`
 2. Changes to `shared/` affect both apps — test both before committing
 3. Run `npm run check` in the changed app before pushing
+
+---
+
+## Data Flow & Chaining
+
+```
+[Builder] Design form  →  shared/forms/configs/<formId>/
+[Builder] Design report →  shared/reports/configs/<reportId>/
+
+[Runner] Student opens /form/<formId>
+       → fills out SurveyJS form
+       → submits → saved to PostgreSQL (answers as JSONB snapshot)
+       → redirected to /report/<reportId>?sub=<submissionId>
+
+[Runner] Report page reads ?sub=<submissionId>
+       → fetches answers from DB
+       → injects data into Puck DataFieldBlocks
+       → student sees their personalized report
+
+[Fallback] Report also accepts raw URL params:
+       /report/<reportId>?name=Ali&grade=5A&class=5A
+       (useful for sharing without a form submission)
+```
+
+Forms and reports can be **chained in a wizard sequence**:  
+`form-A → report-B → form-C → report-D → ...`

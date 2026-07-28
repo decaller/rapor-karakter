@@ -10,104 +10,145 @@
 - [x] Add root `.gitignore`
 - [x] Add root `README.md`
 - [x] Add `@shared/*` path alias in both builder and runner tsconfigs
-- [ ] Add root-level `package.json` with workspace scripts (e.g. `dev:builder`, `dev:runner`, `dev:all`)
+- [ ] Add root-level convenience scripts (e.g. `run-builder.sh`, `run-runner.sh`)
 - [ ] Set up GitHub remote and push to origin
-- [ ] Add `.env.example` to runner
-- [ ] CI/CD: GitHub Actions — lint + type-check on PR
+- [ ] Add `.env.example` to runner (document `DATABASE_URL`, `ADMIN_PASSWORD`)
+- [ ] Fix pre-existing `drizzle.config.ts` type error (`DATABASE_URL` may be `undefined`)
 
 ---
 
 ## 📝 Builder App
 
-### Form Creator
-- [x] Integrate SurveyJS Creator (`/formCreator`)
-- [x] Save form JSON to `shared/forms/configs/<formId>/`
-- [ ] Route `/formCreator` should list existing form configs and allow creating new ones
-- [ ] Give forms a human-readable name/title (not just a folder ID)
-- [ ] Delete / duplicate form configs from the listing page
+> The builder is **offline-only** — runs locally on the teacher's/admin's machine. No auth required. No deployment.
 
-### Report Creator (Puck)
+### Dashboard (`/dashboard`) — Page Manager
+- [ ] List all forms (`shared/forms/configs/`) and reports (`shared/reports/configs/`) in two sections
+- [ ] Each card shows: ID, last modified date
+- [ ] Actions per card:
+  - [ ] **Open** → navigates to `/formCreator/$formId` or `/reportCreator/$reportId`
+  - [ ] **Duplicate** → copies the folder in `shared/` with a new ID (timestamp suffix)
+  - [ ] **Delete** → deletes the file/folder from disk (file-only, no DB — simpler, reversible via git)
+- [ ] **New Form** button → creates empty `shared/forms/configs/<uuid>/index.json`, navigates to editor
+- [ ] **New Report** button → creates empty `shared/reports/configs/<uuid>/index.json`, navigates to editor
+- [ ] Forms and Reports use a human-readable `name` field stored in the config JSON (e.g., `{ "name": "Rapor Semester 1", ... }`)
+
+### Form Creator (`/formCreator/$formId`)
+- [x] Integrate SurveyJS Creator
+- [x] Save form JSON to `shared/forms/configs/<formId>/`
+- [ ] Save `name` metadata alongside survey JSON
+- [ ] "Back to Dashboard" breadcrumb/button
+- [ ] Chain config: set a **next report ID** — after submit the runner redirects to `/report/<reportId>?sub=<submissionId>`
+
+### Report Creator (`/reportCreator/$reportId`)
 - [x] Integrate Puck editor (`/reportCreator/$reportId`)
 - [x] `<Puck>` editor with 4 blocks: `HeadingBlock`, `TextBlock`, `TableBlock`, `ImageBlock`
 - [x] Save/load report JSON to/from `shared/reports/configs/<reportId>/index.json`
-- [ ] `/reportCreator` listing page — show all report IDs (currently hardcoded to `report1`)
-- [ ] Add a "New Report" flow — let user enter a report ID / name
-- [ ] Delete / duplicate report configs
-- [ ] Add more Puck blocks: `DividerBlock`, `SpacerBlock`, `StudentInfoBlock`
-- [ ] Add per-block print/page-break hints for PDF export
-
-### General Builder UX
-- [ ] Dashboard (`/dashboard`) — show summary stats (form count, report count)
-- [ ] Auth gate — only authenticated admins should access the builder
-- [ ] Light/dark theme persistence (currently resets on reload)
+- [ ] Save `name` metadata alongside Puck JSON
+- [ ] "Back to Dashboard" breadcrumb/button
+- [ ] Add more Puck blocks:
+  - [ ] `DividerBlock` — horizontal rule
+  - [ ] `SpacerBlock` — adjustable vertical gap
+  - [ ] `DataFieldBlock` — renders a value from URL query param or submission (e.g. `?name`, `?grade`)
+  - [ ] `ConditionalBlock` — show/hide based on a query param value
+- [ ] Chain config: set a **next form ID** — report page can have a "Fill next form →" button
 
 ---
 
 ## 🏃 Runner App
 
-### Form Viewer
-- [x] Route `/form/$formId` scaffolded
+> The runner is deployed publicly. Two audiences: **students** (fill forms, view reports) and **admin** (view all responses, manage data).
+
+### Student Flow
+
+#### Form (`/form/$formId`)
 - [ ] Render SurveyJS form from `shared/forms/configs/<formId>/`
-- [ ] Save form responses to PostgreSQL via Drizzle
-- [ ] Show completion confirmation / thank-you screen
+- [ ] On submit: save response to PostgreSQL (see DB schema below)
+- [ ] On submit: redirect to `/report/<nextReportId>?sub=<submissionId>` if a chain is configured
 
-### Report Viewer
-- [x] Route `/report/$reportId` with Puck `<Render>`
-- [x] Loads JSON from `shared/reports/configs/<reportId>/index.json`
-- [ ] PDF export button (print stylesheet or `react-to-pdf`)
-- [ ] Dynamic data injection — replace placeholder blocks with real student data from DB
+#### Report (`/report/$reportId`)
+- [x] Route scaffolded with Puck `<Render>`
+- [x] Loads Puck layout JSON from `shared/reports/configs/<reportId>/index.json`
+- [ ] Read `?sub=<submissionId>` → fetch that submission's answers from DB → inject into Puck context
+- [ ] Read URL query params as fallback data (e.g. `?name=Ali&grade=5A`) when no `sub` provided
+- [ ] `DataFieldBlock` reads from injected data context
+- [ ] **Print button** → triggers `window.print()` with a clean print stylesheet
+- [ ] "Fill next form →" button if a next-form chain is configured on the report
 
-### Dashboard
-- [ ] `/dashboard` — student-facing overview of their forms and report cards
-- [ ] Auth — student login (session-based or magic link)
+### Admin Area (`/admin/*`)
 
-### Database (Drizzle + PostgreSQL)
-- [ ] Define schema: `students`, `form_responses`, `report_assignments`
-- [ ] Run initial migration
-- [ ] Wire up form response saving
-- [ ] Wire up student ↔ report assignment
+#### Auth
+- [ ] `/admin/login` — simple password form (password set in `ADMIN_PASSWORD` env var)
+- [ ] Session cookie stored on success (server-side, HttpOnly)
+- [ ] All `/admin/*` routes protected by session check server-side
+- [ ] `/admin/logout` clears session
 
-### Infrastructure
-- [ ] Fix pre-existing `drizzle.config.ts` type error (`DATABASE_URL` may be `undefined`)
-- [ ] Sentry integration test — verify error capture works in dev
-- [ ] Production deploy (VPS / Railway / Vercel)
+#### Dashboard (`/admin/dashboard`)
+- [ ] Submission table: columns — Form Name, Submission ID, Submitted At, (first N answer values)
+- [ ] Filter by form ID
+- [ ] Search across answer data
+- [ ] Pagination
+- [ ] Per-row actions:
+  - [ ] View full answers
+  - [ ] Open linked report (`/report/<id>?sub=<submissionId>`)
+  - [ ] Delete submission
+
+#### Export
+- [ ] Export all submissions for a form as CSV
+- [ ] Export as JSON
+- [ ] (Later) Bulk PDF generation via Puppeteer/Playwright
 
 ---
 
-## 🔗 Shared
+## 🗄️ Database (Drizzle + PostgreSQL)
 
-- [x] `shared/reports/components/puck.config.ts` — block field schemas
-- [x] Per-app `puck.config.tsx` wrappers with React renderers
-- [x] `shared/forms/configs/` — SurveyJS JSON storage
-- [x] `shared/reports/configs/` — Puck JSON storage
-- [ ] Add a `shared/students/` directory for student metadata JSON (if not using DB)
-- [ ] Consider migrating `shared/` JSON storage to PostgreSQL once DB is stable
+### Schema
+
+```
+forms_submissions
+  id          uuid  PK  default gen_random_uuid()
+  form_id     text  NOT NULL          -- matches shared/forms/configs/<formId>/
+  answers     jsonb NOT NULL          -- snapshot of all field values at submit time
+  submitted_at timestamptz default now()
+```
+
+- [ ] Write Drizzle schema (`src/db/schema.ts`)
+- [ ] Run initial migration (`npm run db:push`)
+- [ ] Server fn: `saveSubmission(formId, answers)` → returns `submissionId`
+- [ ] Server fn: `getSubmission(submissionId)` → returns answers JSON
+- [ ] Server fn: `listSubmissions(formId?)` → paginated list for admin dashboard
+- [ ] Server fn: `deleteSubmission(id)`
+- [ ] Server fn: `exportSubmissions(formId)` → CSV string
+
+### Backup / Portability
+- [ ] After each submission also write a JSON file to `shared/forms/responses/<formId>/<submissionId>.json`
+- [ ] Git-committed backups are optional but useful for offline restore
 
 ---
 
-## 🎨 Design & UX Polish
+## 🎨 Design & UX
 
-- [ ] Replace builder homepage (`/`) placeholder text with actual product copy
-- [ ] Runner homepage — welcoming student landing page
-- [ ] Consistent component library across both apps (extract to `shared/ui/`)
-- [ ] Mobile responsiveness audit for the runner (report viewer + form)
-- [ ] Print stylesheet for report cards
+- [ ] Builder dashboard — card-based grid layout with form/report type badges
+- [ ] Runner: print stylesheet for report cards (`@media print`)
+- [ ] Runner: mobile-friendly form layout
+- [ ] Replace builder and runner homepage placeholder text with real copy
+- [ ] Consistent empty states (no forms yet, no reports yet)
 
 ---
 
 ## 🔒 Security
 
-- [ ] Builder: protect all routes behind admin auth
-- [ ] Runner: students should only see their own reports and forms
-- [ ] Validate `reportId` / `formId` path params server-side (prevent path traversal)
-- [ ] Add rate limiting to server functions
+- [ ] Admin routes: validate session cookie server-side on every request
+- [ ] Validate `formId` / `reportId` / `submissionId` path params (no `../` path traversal)
+- [ ] Rate-limit form submission server fn (prevent spam)
+- [ ] `ADMIN_PASSWORD` must not be committed — add to `.gitignore` / `.env.example`
 
 ---
 
 ## 📦 Future / Nice-to-Have
 
-- [ ] Multi-language support (Bahasa Indonesia primary)
-- [ ] Email delivery of report cards (PDF attachment)
-- [ ] Bulk report generation (generate PDFs for a whole class)
-- [ ] Teacher comments block in report template
-- [ ] QR code on report card linking to online version
+- [ ] Multi-language UI (Bahasa Indonesia primary)
+- [ ] Email delivery — send report link to student after submission
+- [ ] Bulk PDF export for admin (generate PDFs for an entire class via Puppeteer)
+- [ ] QR code on report linking back to the online version
+- [ ] Form versioning — lock a form version after first response so changing the form doesn't break existing submissions
+- [ ] Offline PWA mode for runner (for schools with unreliable internet)
