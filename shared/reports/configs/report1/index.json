@@ -1,0 +1,41 @@
+{
+  "root": {
+    "props": {}
+  },
+  "content": [
+    {
+      "type": "HeadingBlock",
+      "props": {
+        "text": "Heading",
+        "level": "1",
+        "id": "HeadingBlock-5c4b9578-9a05-4bd7-9e36-c16329f2ad6a"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "Enter text here...",
+        "id": "TextBlock-d0fd5e30-d706-48ef-840a-e8df4f7331ca"
+      }
+    },
+    {
+      "type": "TableBlock",
+      "props": {
+        "caption": "Table caption",
+        "columns": "Name, Score, Grade",
+        "rows": "Ali|90|A\nBudi|80|B",
+        "id": "TableBlock-f937014a-0f85-4c65-b753-53581fecc784"
+      }
+    },
+    {
+      "type": "ImageBlock",
+      "props": {
+        "src": "",
+        "alt": "Image",
+        "width": "100%",
+        "id": "ImageBlock-78dff362-b65a-4ef5-a2b6-a83d4674dd8c"
+      }
+    }
+  ],
+  "zones": {}
+}
