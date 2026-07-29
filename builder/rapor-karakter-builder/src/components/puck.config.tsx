@@ -42,6 +42,33 @@ function ImageBlockRender({ src, alt, width }: { src: string; alt: string; width
     )
 }
 
+function QueryTableBlockRender({ paramName }: { paramName: string }) {
+    const items = ['a', 'b', 'c']
+    return (
+        <div style={{ overflowX: 'auto', margin: '0.5rem 0', opacity: 0.8 }}>
+            <div style={{ marginBottom: '0.25rem', fontSize: '0.8rem', color: '#666' }}>
+                Previewing query param: <strong>?{paramName}</strong>=a,b,c
+            </div>
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
+                <thead>
+                    <tr>
+                        <th style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem', background: '#f5f5f5', textAlign: 'left', width: '50px' }}>#</th>
+                        <th style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem', background: '#f5f5f5', textAlign: 'left' }}>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {items.map((item, index) => (
+                        <tr key={index}>
+                            <td style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem' }}>{index}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem' }}>{item}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const reportConfig: Config = {
     components: {
@@ -49,5 +76,6 @@ export const reportConfig: Config = {
         TextBlock: { ...reportComponentFields.TextBlock, render: TextBlockRender as any },
         TableBlock: { ...reportComponentFields.TableBlock, render: TableBlockRender as any },
         ImageBlock: { ...reportComponentFields.ImageBlock, render: ImageBlockRender as any },
+        QueryTableBlock: { ...reportComponentFields.QueryTableBlock, render: QueryTableBlockRender as any },
     },
 }

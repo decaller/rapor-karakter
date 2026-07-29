@@ -42,4 +42,10 @@ export const reportComponentFields = {
         },
         defaultProps: { src: '', alt: 'Image', width: '100%' },
     },
+    QueryTableBlock: {
+        fields: {
+            paramName: { type: 'text' as const },
+        },
+        defaultProps: { paramName: 'data' },
+    },
 } as const

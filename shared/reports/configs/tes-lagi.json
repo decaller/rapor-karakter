@@ -9,6 +9,13 @@
         "content": "Enter text here... {{data}}",
         "id": "TextBlock-04b9d84d-0251-449d-8968-69fe4ab05272"
       }
+    },
+    {
+      "type": "QueryTableBlock",
+      "props": {
+        "paramName": "data",
+        "id": "QueryTableBlock-e1c54de6-ec45-43c3-ac4c-e7d62b353441"
+      }
     }
   ],
   "zones": {}
