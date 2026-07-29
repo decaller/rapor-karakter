@@ -6,14 +6,14 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "dotenv -e .env.local -- sh -c \"NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port ${VITE_RUNNER_PORT:-3001}\"",
+    "dev": "dotenv -e .env.local -- sh -c \"vite dev --port ${VITE_RUNNER_PORT:-3001}\"",
     "generate-routes": "tsr generate",
-    "build": "vite build && cp instrument.server.mjs .output/server",
+    "build": "vite build",
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "start": "node --import ./.output/server/instrument.server.mjs .output/server/index.mjs",
+    "start": "node .output/server/index.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@puckeditor/core": "^0.22.3",
-    "@sentry/tanstackstart-react": "^10.67.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
     "@tanstack/react-router": "latest",
@@ -38,6 +37,7 @@
     "pg": "^8.16.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-resizable-panels": "^4.12.2",
     "survey-core": "^2.5.36",
     "survey-react-ui": "^2.5.36",
     "tailwind-merge": "^3.0.2",
@@ -62,8 +62,7 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
-      "lightningcss",
-      "@sentry/cli"
+      "lightningcss"
     ]
   }
 }

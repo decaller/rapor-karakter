@@ -11,11 +11,14 @@ const config = defineConfig({
   resolve: { tsconfigPaths: true },
   plugins: [
     devtools(),
-    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+    nitro(),
     tailwindcss(),
     tanstackStart(),
     viteReact(),
   ],
+  ssr: {
+    noExternal: ['react-resizable-panels']
+  }
 })
 
 export default config

@@ -10,31 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as FormFormIdRouteImport } from './routes/form/$formId'
 import { Route as ReportReportIdRouteImport } from './routes/report/$reportId'
-import { Route as DemoSentryTestingRouteImport } from './routes/demo/sentry.testing'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DemoDrizzleRoute = DemoDrizzleRouteImport.update({
-  id: '/demo/drizzle',
-  path: '/demo/drizzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FormFormIdRoute = FormFormIdRouteImport.update({
@@ -47,78 +34,39 @@ const ReportReportIdRoute = ReportReportIdRouteImport.update({
   path: '/report/$reportId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DemoSentryTestingRoute = DemoSentryTestingRouteImport.update({
-  id: '/demo/sentry/testing',
-  path: '/demo/sentry/testing',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
-  '/demo/drizzle': typeof DemoDrizzleRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
-  '/demo/sentry/testing': typeof DemoSentryTestingRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/dashboard'
-    | '/demo/drizzle'
-    | '/form/$formId'
-    | '/report/$reportId'
-    | '/demo/sentry/testing'
+  fullPaths: '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/dashboard'
-    | '/demo/drizzle'
-    | '/form/$formId'
-    | '/report/$reportId'
-    | '/demo/sentry/testing'
-  id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/dashboard'
-    | '/demo/drizzle'
-    | '/form/$formId'
-    | '/report/$reportId'
-    | '/demo/sentry/testing'
+  to: '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
+  id: '__root__' | '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
   DashboardRoute: typeof DashboardRoute
-  DemoDrizzleRoute: typeof DemoDrizzleRoute
   FormFormIdRoute: typeof FormFormIdRoute
   ReportReportIdRoute: typeof ReportReportIdRoute
-  DemoSentryTestingRoute: typeof DemoSentryTestingRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,25 +78,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/demo/drizzle': {
-      id: '/demo/drizzle'
-      path: '/demo/drizzle'
-      fullPath: '/demo/drizzle'
-      preLoaderRoute: typeof DemoDrizzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/form/$formId': {
@@ -165,24 +99,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/demo/sentry/testing': {
-      id: '/demo/sentry/testing'
-      path: '/demo/sentry/testing'
-      fullPath: '/demo/sentry/testing'
-      preLoaderRoute: typeof DemoSentryTestingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
   DashboardRoute: DashboardRoute,
-  DemoDrizzleRoute: DemoDrizzleRoute,
   FormFormIdRoute: FormFormIdRoute,
   ReportReportIdRoute: ReportReportIdRoute,
-  DemoSentryTestingRoute: DemoSentryTestingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
