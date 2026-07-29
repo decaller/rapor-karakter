@@ -1,7 +1,11 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import ThemeToggle from './ThemeToggle'
 
 export default function Header() {
+  const { pathname, search } = useRouterState({ select: (s) => s.location })
+  const isDashboard = pathname.startsWith('/dashboard')
+  const tab = isDashboard ? (search as any).tab || 'home' : undefined
+
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--line)] bg-[var(--header-bg)] px-4 backdrop-blur-lg">
       <nav className="page-wrap flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-4">
@@ -14,6 +18,32 @@ export default function Header() {
             Rapor Karakter
           </Link>
         </h2>
+
+        {isDashboard && (
+          <div className="flex gap-6 ml-4 sm:ml-8 mt-2 sm:mt-0 items-center">
+            <Link
+              to="/dashboard"
+              search={{ tab: 'home' }}
+              className={`text-sm font-semibold transition-colors ${tab === 'home' ? 'text-[var(--sea-ink)]' : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'}`}
+            >
+              Home
+            </Link>
+            <Link
+              to="/dashboard"
+              search={{ tab: 'data' }}
+              className={`text-sm font-semibold transition-colors ${tab === 'data' ? 'text-[var(--sea-ink)]' : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'}`}
+            >
+              Data
+            </Link>
+            <Link
+              to="/dashboard"
+              search={{ tab: 'monitoring' }}
+              className={`text-sm font-semibold transition-colors ${tab === 'monitoring' ? 'text-[var(--sea-ink)]' : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'}`}
+            >
+              Monitoring
+            </Link>
+          </div>
+        )}
 
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
           <ThemeToggle />
