@@ -1,0 +1,56 @@
+/* puck-theme.css */
+/* Minimal overrides for dark mode syncing with Shadcn UI variables */
+.dark .Puck,
+.dark {
+  /* Dark surfaces (backgrounds) */
+  --puck-color-surface: var(--card);
+  --puck-color-surface-muted: var(--muted);
+  --puck-color-surface-subtle: var(--background);
+  --puck-color-surface-inverse: var(--card-foreground);
+
+  /* Light text */
+  --puck-color-text: var(--foreground);
+  --puck-color-text-secondary: var(--muted-foreground);
+  --puck-color-text-muted: var(--muted-foreground);
+  --puck-color-text-inverse: var(--background);
+
+  /* Dark borders */
+  --puck-color-border: var(--border);
+  --puck-color-border-hover: var(--ring);
+  --puck-color-border-muted: var(--border);
+
+  /* Optional: Adjust primary interactive colors to pop on dark backgrounds */
+  --puck-color-interactive: var(--primary);
+  --puck-color-interactive-hover: oklch(from var(--primary) l c h / 0.9);
+  --puck-color-interactive-active: oklch(from var(--primary) l c h / 0.8);
+  --puck-color-interactive-subtle: oklch(from var(--primary) l c h / 0.1);
+
+  /* Sidebars and Panels */
+  --puck-color-bg: var(--background);
+  --puck-sidebar-left-color-bg: var(--background);
+  --puck-sidebar-right-color-bg: var(--background);
+  --puck-header-color-bg: var(--background);
+  --puck-drawer-color-bg: var(--background);
+  --puck-pluginbar-color-bg: oklch(from var(--muted) l c h / 0.5);
+
+  /* Overrides for text color in nested components */
+  --puck-slot-color-bg: oklch(from var(--muted) l c h / 0.3);
+  --puck-color-white: var(--background);
+}
+
+/* Ensure inputs and labels look good */
+.dark .Puck label {
+  color: var(--foreground);
+}
+
+.dark .Puck input,
+.dark .Puck select {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.dark .Puck input:focus,
+.dark .Puck select:focus {
+  border-color: var(--ring);
+}

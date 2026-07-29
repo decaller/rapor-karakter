@@ -8,6 +8,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { ThemeToggle } from './theme-toggle'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import {
@@ -61,6 +62,7 @@ export function DashboardHeader({
 
             {activeItem && (
                 <div className="flex items-center gap-2">
+                    <ThemeToggle />
                     <Button variant="ghost" size="icon" asChild>
                         <a 
                             href={`http://localhost:${import.meta.env.VITE_RUNNER_PORT || 3001}/${activeItem.type}/${activeItem.id}`} 

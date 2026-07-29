@@ -4,6 +4,12 @@ import { SurveyCreator, SurveyCreatorComponent } from 'survey-creator-react'
 import { createServerFn } from '@tanstack/react-start'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
+import { useTheme } from './theme-provider'
+import { DefaultDark } from "survey-creator-core/themes"
+import { registerCreatorTheme } from "survey-creator-core"
+
+// Register the dark theme globally
+registerCreatorTheme(DefaultDark)
 
 // THESE ARE NOT NEEDED ANYMORE SINCE IMPORTED IN sytles.css
 // import 'survey-core/defaultV2.min.css'
@@ -52,6 +58,23 @@ const saveFormFn = createServerFn({ method: 'POST' })
 
 export function FormEditorInline({ formId }: { formId: string }) {
     const [creator, setCreator] = useState<SurveyCreator | null>(null)
+    const { theme } = useTheme()
+
+    // Sync theme to creator whenever it changes
+    useEffect(() => {
+        if (creator) {
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            if (isDark) {
+                if (typeof creator.applyCreatorTheme === 'function') {
+                    creator.applyCreatorTheme(DefaultDark)
+                } else {
+                    creator.theme = 'defaultV2Dark'
+                }
+            } else {
+                creator.theme = 'defaultV2'
+            }
+        }
+    }, [theme, creator])
 
     useEffect(() => {
         setCreator(null) // clear old creator
@@ -60,6 +83,16 @@ export function FormEditorInline({ formId }: { formId: string }) {
         loadFormFn({ data: formId }).then((json) => {
             if (!isMounted) return
             const newCreator = new SurveyCreator(defaultCreatorOptions)
+            const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            if (isDark) {
+                if (typeof newCreator.applyCreatorTheme === 'function') {
+                    newCreator.applyCreatorTheme(DefaultDark)
+                } else {
+                    newCreator.theme = 'defaultV2Dark'
+                }
+            } else {
+                newCreator.theme = 'defaultV2'
+            }
             newCreator.JSON = json
             newCreator.saveSurveyFunc = (saveNo: number, callback: (no: number, isSuccess: boolean) => void) => {
                 saveFormFn({ data: { formId, data: newCreator.JSON } })
