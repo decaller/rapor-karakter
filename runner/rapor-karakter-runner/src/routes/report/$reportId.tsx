@@ -6,6 +6,7 @@ import type { Data } from '@puckeditor/core'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { reportConfig } from '#/components/puck.config'
+import { ReportContext } from '#/components/ReportContext'
 
 // ---------------------------------------------------------------------------
 // Server function — load report JSON from shared directory
@@ -42,6 +43,7 @@ export const Route = createFileRoute('/report/$reportId')({
 
 function ReportPage() {
     const data = Route.useLoaderData()
+    const search = Route.useSearch({ strict: false }) as Record<string, unknown>
     const [isMounted, setIsMounted] = useState(false)
 
     useEffect(() => {
@@ -65,8 +67,10 @@ function ReportPage() {
     }
 
     return (
-        <main className="page-wrap px-4 pt-14 pb-8">
-            <Render config={reportConfig} data={data} />
-        </main>
+        <ReportContext.Provider value={search}>
+            <main className="page-wrap px-4 pt-14 pb-8">
+                <Render config={reportConfig} data={data} />
+            </main>
+        </ReportContext.Provider>
     )
 }

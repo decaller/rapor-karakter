@@ -6,7 +6,7 @@
     {
       "type": "TextBlock",
       "props": {
-        "content": "Enter text here...",
+        "content": "Enter text here... {{data}}",
         "id": "TextBlock-04b9d84d-0251-449d-8968-69fe4ab05272"
       }
     }
