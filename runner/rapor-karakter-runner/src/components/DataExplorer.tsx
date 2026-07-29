@@ -29,7 +29,7 @@ function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
         {schemaProfile.map((field: any) => {
           const isHidden = hiddenColumns[field.field]
           return (
-            <div 
+            <div
               key={field.field}
               onClick={() => toggleColumn(field.field)}
               className="flex items-center justify-between p-2 hover:bg-muted rounded cursor-pointer group transition-colors"
@@ -61,13 +61,13 @@ function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
 // 2. Data Grid Panel Component
 function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRowId }: any) {
   const columnHelper = createColumnHelper<any>()
-  
+
   const columns = useMemo(() => {
     const baseCols = [
       columnHelper.accessor('id', { header: 'ID', size: 60 }),
       columnHelper.accessor('formId', { header: 'Form ID' }),
     ]
-    
+
     const dynamicCols = schemaProfile
       .filter((field: any) => !hiddenColumns[field.field])
       .map((field: any) =>
@@ -83,7 +83,7 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
           }
         })
       )
-      
+
     return [...baseCols, ...dynamicCols]
   }, [schemaProfile, hiddenColumns])
 
@@ -109,10 +109,10 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
         </thead>
         <tbody className="divide-y divide-border">
           {table.getRowModel().rows.map((row) => (
-            <tr 
-              key={row.id} 
+            <tr
+              key={row.id}
               onClick={() => onRowClick(row.original)}
-              className={`hover:bg-muted cursor-pointer transition-colors ${selectedRowId === row.original.id ? 'bg-muted' : ''}`}
+              className={`hover:bg-muted cursor-pointer transition-colors ${selectedRowId === (row.original as any).id ? 'bg-muted' : ''}`}
             >
               {row.getVisibleCells().map((cell) => (
                 <td key={cell.id} className="px-4 py-2 border-r border-border last:border-r-0 max-w-[200px]">
@@ -122,11 +122,11 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
             </tr>
           ))}
           {table.getRowModel().rows.length === 0 && (
-             <tr>
-               <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
-                 No records found.
-               </td>
-             </tr>
+            <tr>
+              <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
+                No records found.
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -153,9 +153,9 @@ function ReportPreview({ selectedRecord }: any) {
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground font-mono">ID: {selectedRecord.id}</span>
           {selectedRecord.reportUrl && (
-            <a 
-              href={selectedRecord.reportUrl} 
-              target="_blank" 
+            <a
+              href={selectedRecord.reportUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs bg-muted hover:bg-muted-foreground/20 text-foreground px-2 py-1 rounded transition-colors border border-border"
             >
@@ -167,8 +167,8 @@ function ReportPreview({ selectedRecord }: any) {
       </div>
       <div className="flex-1 overflow-hidden relative bg-muted/20">
         {selectedRecord.reportUrl ? (
-          <iframe 
-            src={selectedRecord.reportUrl} 
+          <iframe
+            src={selectedRecord.reportUrl}
             className="absolute inset-0 w-full h-full border-0"
             title={`Report ${selectedRecord.id}`}
           />
@@ -188,7 +188,7 @@ export function DataExplorer() {
     queryKey: ['jsonb-records'],
     queryFn: () => getDataRecords(),
   })
-  
+
   const [selectedRecord, setSelectedRecord] = useState<any>(null)
   const rightPanelRef = usePanelRef()
   const leftPanelRef = usePanelRef()
@@ -246,17 +246,16 @@ export function DataExplorer() {
       className="h-full w-full rounded-none border-t border-border"
     >
       {/* Left Panel: Schema Analyzer */}
-      <ResizablePanel 
+      <ResizablePanel
         panelRef={leftPanelRef}
-        defaultSize={20} 
-        minSize={15} 
+        defaultSize={20}
+        minSize={15}
         collapsible
-        onCollapse={() => setIsLeftCollapsed(true)}
-        onExpand={() => setIsLeftCollapsed(false)}
+        onResize={(size) => setIsLeftCollapsed(size.asPercentage === 0)}
         className="bg-background relative border-r border-border"
       >
-        <SchemaAnalyzer 
-          schemaProfile={data?.schemaProfile || []} 
+        <SchemaAnalyzer
+          schemaProfile={data?.schemaProfile || []}
           hiddenColumns={hiddenColumns}
           toggleColumn={toggleColumn}
         />
@@ -266,8 +265,8 @@ export function DataExplorer() {
 
       {/* Center Panel: Data Grid */}
       <ResizablePanel defaultSize={selectedRecord ? 50 : 80} minSize={30} className="relative bg-background flex flex-col">
-         {/* Center Top Toolbar */}
-         <div className="flex justify-between items-center p-2 border-b border-border bg-background">
+        {/* Center Top Toolbar */}
+        <div className="flex justify-between items-center p-2 border-b border-border bg-background">
           <div className="flex items-center gap-2">
             <button
               onClick={toggleLeftPanel}
@@ -293,8 +292,8 @@ export function DataExplorer() {
 
         {/* The Grid itself */}
         <div className="flex-1 overflow-hidden">
-          <JsonbTable 
-            data={data?.records || []} 
+          <JsonbTable
+            data={data?.records || []}
             schemaProfile={data?.schemaProfile || []}
             hiddenColumns={hiddenColumns}
             onRowClick={handleRowClick}
@@ -309,14 +308,8 @@ export function DataExplorer() {
       <ResizablePanel
         panelRef={rightPanelRef}
         collapsible
-        defaultSize={0} // Start collapsed or 30% if we wanted open by default. Use 30 but state is collapsed? react-resizable-panels starts collapsed if defaultSize is 0, but here let's set it to 30 and manage via ref.
-        // Actually, to make it start collapsed, we just don't pass defaultSize=0, we let it be defaultSize={30} but we need a way to collapse on mount.
-        // Or if we want it collapsed initially, we can't easily do it via props without causing jitter, but we can do it via `defaultSize={0}` and then `expand()` sets it to `minSize` or similar. Let's use defaultSize={30} but use `useLayoutEffect` or we just let it be open if defaultSize=30.
-        // For simplicity, let's make it 30 by default but if `!selectedRecord`, it shows the placeholder.
-        // The user said "lets try the 3 panel first" and they wanted to "see the report on the right side". Let's give it defaultSize={30} and let it stay open to act as a preview pane!
-        onCollapse={() => setIsRightCollapsed(true)}
-        onExpand={() => setIsRightCollapsed(false)}
-        defaultSize={30}
+        onResize={(size) => setIsRightCollapsed(size.asPercentage === 0)}
+        defaultSize={50}
         minSize={20}
         className="bg-background"
       >
