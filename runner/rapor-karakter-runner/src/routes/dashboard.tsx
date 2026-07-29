@@ -43,13 +43,13 @@ function DashboardComponent() {
   const { tab } = Route.useSearch()
 
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
-      <main className="flex-1 overflow-hidden bg-[var(--page-bg)]">
+    <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-background text-foreground">
+      <main className="flex-1 overflow-hidden bg-background">
         {tab === 'home' && (
           <div className="h-full p-4 sm:p-6">
-            <div className="border-2 border-dashed border-[var(--line)] rounded-xl h-full flex flex-col items-center justify-center bg-white/50">
-              <h2 className="text-xl font-bold text-[var(--sea-ink)] mb-2">Grid Dashboard</h2>
-              <p className="text-[var(--sea-ink-soft)]">Blank container for now</p>
+            <div className="border-2 border-dashed border-border rounded-xl h-full flex flex-col items-center justify-center bg-muted/50">
+              <h2 className="text-xl font-bold text-foreground mb-2">Grid Dashboard</h2>
+              <p className="text-muted-foreground">Blank container for now</p>
             </div>
           </div>
         )}
@@ -60,7 +60,7 @@ function DashboardComponent() {
 
         {tab === 'monitoring' && (
           <div className="h-full p-4 flex flex-col items-center justify-center">
-            <p className="text-lg text-[var(--sea-ink-soft)] font-medium">Monitoring reserved for later</p>
+            <p className="text-lg text-muted-foreground font-medium">Monitoring reserved for later</p>
           </div>
         )}
       </main>

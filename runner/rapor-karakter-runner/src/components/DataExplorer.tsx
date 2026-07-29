@@ -6,7 +6,7 @@ import {
   flexRender,
   createColumnHelper,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, Loader2, FileJson, CheckSquare, Square } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Loader2, FileJson, CheckSquare, Square, ExternalLink } from 'lucide-react'
 import { usePanelRef } from 'react-resizable-panels'
 import {
   ResizableHandle,
@@ -19,11 +19,11 @@ import { getDataRecords } from '../server/data'
 function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
   return (
     <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-4 border-b border-[var(--line)] bg-[var(--chip-bg)] sticky top-0 z-10">
-        <h3 className="font-semibold text-sm text-[var(--sea-ink)] flex items-center gap-2">
+      <div className="p-4 border-b border-border bg-background sticky top-0 z-10">
+        <h3 className="font-semibold text-sm text-foreground flex items-center gap-2">
           <FileJson className="w-4 h-4" /> Schema Profiler
         </h3>
-        <p className="text-xs text-[var(--sea-ink-soft)] mt-1">Discovered fields across dataset</p>
+        <p className="text-xs text-muted-foreground mt-1">Discovered fields across dataset</p>
       </div>
       <div className="p-2">
         {schemaProfile.map((field: any) => {
@@ -32,21 +32,21 @@ function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
             <div 
               key={field.field}
               onClick={() => toggleColumn(field.field)}
-              className="flex items-center justify-between p-2 hover:bg-[var(--chip-bg)] rounded cursor-pointer group transition-colors"
+              className="flex items-center justify-between p-2 hover:bg-muted rounded cursor-pointer group transition-colors"
             >
               <div className="flex items-center gap-2 overflow-hidden">
-                <button className="text-[var(--sea-ink-soft)] group-hover:text-[var(--sea-ink)]">
+                <button className="text-muted-foreground group-hover:text-foreground">
                   {isHidden ? <Square className="w-4 h-4" /> : <CheckSquare className="w-4 h-4" />}
                 </button>
-                <span className={`text-sm truncate ${isHidden ? 'text-[var(--sea-ink-soft)] line-through' : 'text-[var(--sea-ink)]'}`}>
+                <span className={`text-sm truncate ${isHidden ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
                   {field.field}
                 </span>
               </div>
               <div className="flex items-center gap-2 ml-2 shrink-0">
-                <span className="text-[10px] uppercase font-medium px-1.5 py-0.5 rounded bg-[var(--line)] text-[var(--sea-ink-soft)]">
+                <span className="text-[10px] uppercase font-medium px-1.5 py-0.5 rounded bg-border text-muted-foreground">
                   {Object.keys(field.typeDistribution)[0]}
                 </span>
-                <span className="text-xs text-[var(--sea-ink-soft)] w-10 text-right">
+                <span className="text-xs text-muted-foreground w-10 text-right">
                   {field.presencePercentage}%
                 </span>
               </div>
@@ -77,7 +77,7 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
           cell: (info) => {
             const val = info.getValue()
             if (typeof val === 'object' && val !== null) {
-              return <span className="text-xs text-[var(--sea-ink-soft)]">{'{...}'}</span>
+              return <span className="text-xs text-muted-foreground">{'{...}'}</span>
             }
             return <span className="truncate block max-w-[200px]" title={String(val)}>{String(val)}</span>
           }
@@ -94,28 +94,28 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
   })
 
   return (
-    <div className="w-full h-full overflow-auto bg-white">
+    <div className="w-full h-full overflow-auto bg-background">
       <table className="w-full text-sm text-left">
-        <thead className="text-xs text-[var(--sea-ink-soft)] uppercase bg-[var(--page-bg)] sticky top-0 z-10 border-b border-[var(--line)]">
+        <thead className="text-xs text-muted-foreground uppercase bg-background sticky top-0 z-10 border-b border-border">
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
               {hg.headers.map((h) => (
-                <th key={h.id} className="px-4 py-3 font-medium whitespace-nowrap border-r border-[var(--line)] last:border-r-0">
+                <th key={h.id} className="px-4 py-3 font-medium whitespace-nowrap border-r border-border last:border-r-0">
                   {flexRender(h.column.columnDef.header, h.getContext())}
                 </th>
               ))}
             </tr>
           ))}
         </thead>
-        <tbody className="divide-y divide-[var(--line)]">
+        <tbody className="divide-y divide-border">
           {table.getRowModel().rows.map((row) => (
             <tr 
               key={row.id} 
               onClick={() => onRowClick(row.original)}
-              className={`hover:bg-[var(--chip-bg)] cursor-pointer transition-colors ${selectedRowId === row.original.id ? 'bg-[var(--chip-bg)]' : ''}`}
+              className={`hover:bg-muted cursor-pointer transition-colors ${selectedRowId === row.original.id ? 'bg-muted' : ''}`}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="px-4 py-2 border-r border-[var(--line)] last:border-r-0 max-w-[200px]">
+                <td key={cell.id} className="px-4 py-2 border-r border-border last:border-r-0 max-w-[200px]">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
@@ -123,7 +123,7 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
           ))}
           {table.getRowModel().rows.length === 0 && (
              <tr>
-               <td colSpan={columns.length} className="px-4 py-8 text-center text-[var(--sea-ink-soft)]">
+               <td colSpan={columns.length} className="px-4 py-8 text-center text-muted-foreground">
                  No records found.
                </td>
              </tr>
@@ -138,24 +138,45 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
 function ReportPreview({ selectedRecord }: any) {
   if (!selectedRecord) {
     return (
-      <div className="flex h-full items-center justify-center p-6 text-center text-[var(--sea-ink-soft)]">
+      <div className="flex h-full items-center justify-center p-6 text-center text-muted-foreground">
         <p>Select a row to preview the full report data.</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
-      <div className="p-4 border-b border-[var(--line)] bg-[var(--chip-bg)] sticky top-0 z-10 flex justify-between items-center">
-        <h3 className="font-semibold text-sm text-[var(--sea-ink)]">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="p-4 border-b border-border bg-background sticky top-0 z-10 flex justify-between items-center">
+        <h3 className="font-semibold text-sm text-foreground">
           Report Preview
         </h3>
-        <span className="text-xs text-[var(--sea-ink-soft)] font-mono">ID: {selectedRecord.id}</span>
-      </div>
-      <div className="p-4">
-        <div className="bg-[var(--page-bg)] p-4 rounded-lg border border-[var(--line)] font-mono text-xs overflow-x-auto text-[var(--sea-ink)]">
-          <pre>{JSON.stringify(selectedRecord.data, null, 2)}</pre>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-muted-foreground font-mono">ID: {selectedRecord.id}</span>
+          {selectedRecord.reportUrl && (
+            <a 
+              href={selectedRecord.reportUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs bg-muted hover:bg-muted-foreground/20 text-foreground px-2 py-1 rounded transition-colors border border-border"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Open
+            </a>
+          )}
         </div>
+      </div>
+      <div className="flex-1 overflow-hidden relative bg-muted/20">
+        {selectedRecord.reportUrl ? (
+          <iframe 
+            src={selectedRecord.reportUrl} 
+            className="absolute inset-0 w-full h-full border-0"
+            title={`Report ${selectedRecord.id}`}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center p-6 text-center text-muted-foreground">
+            <p>No report URL available for this record.</p>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -206,7 +227,7 @@ export function DataExplorer() {
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[var(--sea-ink-soft)]" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -222,7 +243,7 @@ export function DataExplorer() {
   return (
     <ResizablePanelGroup
       orientation="horizontal"
-      className="h-full w-full rounded-none border-t border-[var(--line)]"
+      className="h-full w-full rounded-none border-t border-border"
     >
       {/* Left Panel: Schema Analyzer */}
       <ResizablePanel 
@@ -232,7 +253,7 @@ export function DataExplorer() {
         collapsible
         onCollapse={() => setIsLeftCollapsed(true)}
         onExpand={() => setIsLeftCollapsed(false)}
-        className="bg-white relative border-r border-[var(--line)]"
+        className="bg-background relative border-r border-border"
       >
         <SchemaAnalyzer 
           schemaProfile={data?.schemaProfile || []} 
@@ -241,29 +262,29 @@ export function DataExplorer() {
         />
       </ResizablePanel>
 
-      <ResizableHandle className="w-1 bg-[var(--line)] hover:bg-[var(--sea-ink-soft)] transition-colors" />
+      <ResizableHandle withHandle />
 
       {/* Center Panel: Data Grid */}
-      <ResizablePanel defaultSize={selectedRecord ? 50 : 80} minSize={30} className="relative bg-white flex flex-col">
+      <ResizablePanel defaultSize={selectedRecord ? 50 : 80} minSize={30} className="relative bg-background flex flex-col">
          {/* Center Top Toolbar */}
-         <div className="flex justify-between items-center p-2 border-b border-[var(--line)] bg-[var(--chip-bg)]">
+         <div className="flex justify-between items-center p-2 border-b border-border bg-background">
           <div className="flex items-center gap-2">
             <button
               onClick={toggleLeftPanel}
-              className="flex h-7 w-7 items-center justify-center rounded border border-[var(--line)] bg-white shadow-sm hover:bg-[var(--page-bg)] text-[var(--sea-ink-soft)] transition-colors"
+              className="flex h-7 w-7 items-center justify-center rounded border border-border bg-background shadow-sm hover:bg-background text-muted-foreground transition-colors"
               title="Toggle Schema Analyzer"
             >
               {isLeftCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
             </button>
-            <span className="text-sm font-semibold text-[var(--sea-ink)] ml-2">Data Records</span>
-            <span className="text-xs bg-white border border-[var(--line)] px-2 py-0.5 rounded-full text-[var(--sea-ink-soft)]">
+            <span className="text-sm font-semibold text-foreground ml-2">Data Records</span>
+            <span className="text-xs bg-background border border-border px-2 py-0.5 rounded-full text-muted-foreground">
               {data?.records?.length || 0} rows
             </span>
           </div>
 
           <button
             onClick={toggleRightPanel}
-            className="flex h-7 w-7 items-center justify-center rounded border border-[var(--line)] bg-white shadow-sm hover:bg-[var(--page-bg)] text-[var(--sea-ink-soft)] transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded border border-border bg-background shadow-sm hover:bg-background text-muted-foreground transition-colors"
             title="Toggle Report Preview"
           >
             {isRightCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -282,7 +303,7 @@ export function DataExplorer() {
         </div>
       </ResizablePanel>
 
-      <ResizableHandle className="w-1 bg-[var(--line)] hover:bg-[var(--sea-ink-soft)] transition-colors" />
+      <ResizableHandle withHandle />
 
       {/* Right Panel: Report Preview */}
       <ResizablePanel
@@ -297,7 +318,7 @@ export function DataExplorer() {
         onExpand={() => setIsRightCollapsed(false)}
         defaultSize={30}
         minSize={20}
-        className="bg-white"
+        className="bg-background"
       >
         <ReportPreview selectedRecord={selectedRecord} />
       </ResizablePanel>
