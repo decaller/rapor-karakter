@@ -5,8 +5,9 @@ import { createServerFn } from '@tanstack/react-start'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
-import 'survey-core/defaultV2.min.css'
-import 'survey-creator-core/survey-creator-core.min.css'
+// THESE ARE NOT NEEDED ANYMORE SINCE IMPORTED IN sytles.css
+// import 'survey-core/defaultV2.min.css'
+// import 'survey-creator-core/survey-creator-core.min.css'
 
 const defaultCreatorOptions: ICreatorOptions = {
     showLogicTab: true,

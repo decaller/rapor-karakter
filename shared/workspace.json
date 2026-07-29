@@ -10,6 +10,11 @@
           "id": "form1",
           "type": "form",
           "name": "Absensi"
+        },
+        {
+          "id": "form-1785286253343",
+          "type": "form",
+          "name": "Bismi"
         }
       ]
     },
@@ -22,6 +27,11 @@
           "id": "report1",
           "type": "report",
           "name": "Rapor S1"
+        },
+        {
+          "id": "report-1785286259358",
+          "type": "report",
+          "name": "Tes"
         }
       ]
     }
