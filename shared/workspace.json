@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "tree": [
+    {
+      "id": "forms-folder",
+      "type": "folder",
+      "name": "Forms",
+      "children": [
+        {
+          "id": "form1",
+          "type": "form",
+          "name": "Absensi"
+        }
+      ]
+    },
+    {
+      "id": "reports-folder",
+      "type": "folder",
+      "name": "Reports",
+      "children": [
+        {
+          "id": "report1",
+          "type": "report",
+          "name": "Rapor S1"
+        }
+      ]
+    }
+  ]
+}
