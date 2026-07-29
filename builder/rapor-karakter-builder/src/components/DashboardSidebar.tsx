@@ -168,7 +168,7 @@ function TreeItemNode({
                             <Icon className="w-4 h-4" />
                             <span>{item.name}</span>
                             <span className="text-[10px] text-muted-foreground ml-2 opacity-50 truncate">
-                                {item.id}
+                                /{item.id}
                             </span>
                         </SidebarMenuButton>
                     </ContextMenuTrigger>

@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { createServerFn } from '@tanstack/react-start'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -40,6 +41,19 @@ export const Route = createFileRoute('/form/$formId')({
 
 function FormPage() {
     const data = Route.useLoaderData()
+    const [isMounted, setIsMounted] = useState(false)
+
+    useEffect(() => {
+        setIsMounted(true)
+    }, [])
+
+    if (!isMounted) {
+        return (
+            <main className="page-wrap px-4 pt-14 pb-8 flex items-center justify-center h-[50vh]">
+                <p className="text-muted-foreground animate-pulse">Loading form...</p>
+            </main>
+        )
+    }
 
     if (!data) {
         return (

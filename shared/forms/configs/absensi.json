@@ -10,15 +10,6 @@
           "title": "Name"
         },
         {
-          "type": "checkbox",
-          "name": "question3",
-          "choices": [
-            "Item 1",
-            "Item 2",
-            "Item 3"
-          ]
-        },
-        {
           "type": "imagepicker",
           "name": "question4",
           "choices": [
@@ -34,10 +25,16 @@
           "imageFit": "cover"
         },
         {
-          "type": "text",
-          "name": "question2"
+          "type": "checkbox",
+          "name": "question2",
+          "choices": [
+            "Item 1",
+            "Item 2",
+            "Item 3"
+          ]
         }
       ]
     }
-  ]
+  ],
+  "navigateToUrl": "http://localhost:3001/report/test-lagi?data={question1},{question2},{question4}"
 }

@@ -48,8 +48,8 @@ export function DashboardHeader({
                                 <BreadcrumbItem>
                                     <BreadcrumbPage>
                                         {activeItem.name}
-                                        <span className="text-muted-foreground text-xs ml-1">
-                                            .{activeItem.type === 'form' ? 'frm' : 'rep'}
+                                        <span className="text-[10px] text-muted-foreground ml-2 opacity-50 truncate">
+                                            /{activeItem.id}
                                         </span>
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>

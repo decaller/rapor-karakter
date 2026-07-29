@@ -41,11 +41,6 @@
           "name": "Absensi"
         },
         {
-          "id": "test-again",
-          "type": "report",
-          "name": "test again"
-        },
-        {
           "id": "tes-lagi",
           "type": "report",
           "name": "Tes lagi"
