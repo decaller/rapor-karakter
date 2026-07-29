@@ -9,6 +9,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '#/components/ui/resizable'
+import { DataExplorer } from '../components/DataExplorer'
+
 
 const checkAuth = createServerFn({ method: 'GET' })
   .handler(async () => {
@@ -40,20 +42,6 @@ export const Route = createFileRoute('/dashboard')({
 function DashboardComponent() {
   const { tab } = Route.useSearch()
 
-  const rightPanelRef = usePanelRef()
-  const [isRightCollapsed, setIsRightCollapsed] = useState(false)
-
-  const toggleRightPanel = () => {
-    const panel = rightPanelRef.current
-    if (panel) {
-      if (panel.isCollapsed()) {
-        panel.expand()
-      } else {
-        panel.collapse()
-      }
-    }
-  }
-
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] overflow-hidden">
       <main className="flex-1 overflow-hidden bg-[var(--page-bg)]">
@@ -67,42 +55,7 @@ function DashboardComponent() {
         )}
 
         {tab === 'data' && (
-          <ResizablePanelGroup
-            orientation="horizontal"
-            className="h-full w-full rounded-none border-t border-[var(--line)]"
-          >
-            <ResizablePanel defaultSize={25} minSize={15} className="bg-[var(--chip-bg)] relative">
-              <div className="flex h-full flex-col p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="font-semibold text-[var(--sea-ink)]">Sidebar</span>
-                  <button
-                    onClick={toggleRightPanel}
-                    className="flex h-6 w-6 items-center justify-center rounded-sm border border-[var(--line)] bg-[var(--page-bg)] shadow-sm hover:bg-[var(--chip-bg)] text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)] transition-colors"
-                    title={isRightCollapsed ? "Expand content panel" : "Collapse content panel"}
-                  >
-                    {isRightCollapsed ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  </button>
-                </div>
-                <p className="text-sm text-[var(--sea-ink-soft)]">Data Explorer</p>
-              </div>
-            </ResizablePanel>
-
-            <ResizableHandle />
-
-            <ResizablePanel
-              panelRef={rightPanelRef}
-              collapsible
-              onCollapse={() => setIsRightCollapsed(true)}
-              onExpand={() => setIsRightCollapsed(false)}
-              defaultSize={75}
-              minSize={30}
-            >
-              <div className="flex h-full flex-col p-6">
-                <span className="font-semibold text-[var(--sea-ink)] mb-4">Content</span>
-                <p className="text-sm text-[var(--sea-ink-soft)]">Main Data View</p>
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          <DataExplorer />
         )}
 
         {tab === 'monitoring' && (
