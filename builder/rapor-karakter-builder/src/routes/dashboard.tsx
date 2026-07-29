@@ -18,6 +18,28 @@ export const Route = createFileRoute('/dashboard')({
     loader: async () => {
         return loadWorkspace()
     },
+    head: ({ loaderData, search }) => {
+        let title = 'Builder Dashboard - Rapor Karakter';
+        if (search && search.id && loaderData) {
+            const findItem = (items: WorkspaceItem[], targetId: string): WorkspaceItem | undefined => {
+                for (const item of items) {
+                    if (item.id === targetId) return item
+                    if (item.children) {
+                        const found = findItem(item.children, targetId)
+                        if (found) return found
+                    }
+                }
+                return undefined
+            }
+            const item = findItem(loaderData.tree, search.id);
+            if (item) {
+                title = `${item.name} - ${search.type === 'form' ? 'Form' : 'Report'} Builder`;
+            }
+        }
+        return {
+            meta: [{ title }]
+        }
+    },
     component: DashboardPage,
 })
 

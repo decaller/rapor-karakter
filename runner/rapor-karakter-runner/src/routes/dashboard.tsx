@@ -36,6 +36,13 @@ export const Route = createFileRoute('/dashboard')({
       })
     }
   },
+  head: ({ search }) => {
+    const tab = (search && search.tab) ? search.tab : 'home'
+    const title = `${tab.charAt(0).toUpperCase() + tab.slice(1)} - Dashboard | Runner`
+    return {
+      meta: [{ title }]
+    }
+  },
   component: DashboardComponent,
 })
 

@@ -52,6 +52,15 @@ const saveFormSubmission = createServerFn({ method: 'POST' })
 
 export const Route = createFileRoute('/form/$formId')({
     loader: ({ params }) => loadForm({ data: params.formId }),
+    head: ({ loaderData, params }) => {
+        let title = `Form ${params.formId} | Runner`
+        if (loaderData?.title) {
+            title = `${loaderData.title} | Runner`
+        }
+        return {
+            meta: [{ title }]
+        }
+    },
     component: FormPage,
 })
 

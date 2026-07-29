@@ -38,6 +38,15 @@ const loadReport = createServerFn({ method: 'GET' })
 
 export const Route = createFileRoute('/report/$reportId')({
     loader: ({ params }) => loadReport({ data: params.reportId }),
+    head: ({ loaderData, params }) => {
+        let title = `Report ${params.reportId} | Runner`
+        if (loaderData?.root?.props?.title) {
+            title = `${loaderData.root.props.title} | Runner`
+        }
+        return {
+            meta: [{ title }]
+        }
+    },
     component: ReportPage,
 })
 
