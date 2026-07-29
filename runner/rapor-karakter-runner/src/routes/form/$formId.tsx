@@ -73,6 +73,56 @@ function FormPage() {
                 const { Survey } = await import('survey-react-ui')
                 const model = new Model(data)
                 
+                const shadcnSurveyTheme = {
+                    themeName: "shadcn",
+                    colorPalette: "dark",
+                    isPanelless: false,
+                    cssVariables: {
+                        "--sjs-general-backcolor": "var(--background)",
+                        "--sjs-general-backcolor-dim": "transparent",
+                        "--sjs-general-backcolor-dark": "var(--background)",
+                        "--sjs-general-dim-forecolor": "var(--muted-foreground)",
+                        "--sjs-general-forecolor": "var(--foreground)",
+                        "--sjs-primary-backcolor": "var(--primary)",
+                        "--sjs-primary-backcolor-light": "var(--muted)",
+                        "--sjs-primary-forecolor": "var(--primary-foreground)",
+                        "--sjs-primary-forecolor-light": "var(--primary-foreground)",
+                        "--sjs-base-unit": "8px",
+                        "--sjs-corner-radius": "calc(var(--radius) - 2px)",
+                        "--sjs-secondary-backcolor": "var(--secondary)",
+                        "--sjs-secondary-backcolor-semi-light": "var(--secondary)",
+                        "--sjs-secondary-forecolor": "var(--secondary-foreground)",
+                        "--sjs-shadow-small": "0 0 0 1px var(--border)",
+                        "--sjs-shadow-medium": "0 0 0 1px var(--border)",
+                        "--sjs-shadow-large": "0 0 0 1px var(--border)",
+                        "--sjs-shadow-inner": "0 0 0 1px var(--border)",
+                        "--sjs-border-light": "var(--border)",
+                        "--sjs-border-default": "var(--border)",
+                        "--sjs-border-inside": "var(--border)",
+                        "--sjs-font-editorfont-color": "var(--foreground)",
+                        "--sjs-font-editorfont-placeholdercolor": "var(--muted-foreground)",
+                        "--sjs-font-questiontitle-color": "var(--foreground)",
+                        "--sjs-font-pagedescription-color": "var(--muted-foreground)",
+                        "--sjs-font-surveytitle-color": "var(--foreground)",
+                        "--sjs-font-surveydescription-color": "var(--muted-foreground)",
+                        "--sjs-question-background": "var(--card)",
+                        "--sjs-questionpanel-backcolor": "var(--card)",
+                        "--sjs-questionpanel-hovercolor": "var(--accent)",
+                        "--sjs-questionpanel-cornerRadius": "var(--radius)",
+                        "--sjs-editor-background": "var(--background)",
+                        "--sjs-editorpanel-backcolor": "var(--background)",
+                        "--sjs-editorpanel-hovercolor": "var(--accent)",
+                        "--sjs-editorpanel-cornerRadius": "var(--radius)",
+                        "--sjs-font-family": "var(--font-sans)",
+                    }
+                };
+
+                if (data.theme) {
+                    model.applyTheme(data.theme)
+                } else {
+                    model.applyTheme(shadcnSurveyTheme)
+                }
+
                 let reportId = null;
                 if (data.navigateToUrl) {
                     try {

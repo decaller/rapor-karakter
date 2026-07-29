@@ -7,13 +7,13 @@ function HeadingBlockRender({ text, level }: { text: string; level: string }) {
     const data = useReportData()
     const resolvedText = resolvePlaceholders(text, data)
     const Tag = (`h${level}`) as React.ElementType
-    return <Tag style={{ margin: '0.5rem 0' }}>{resolvedText}</Tag>
+    return <Tag className="my-2 text-foreground font-heading font-bold">{resolvedText}</Tag>
 }
 
 function TextBlockRender({ content }: { content: string }) {
     const data = useReportData()
     const resolvedContent = resolvePlaceholders(content, data)
-    return <p style={{ margin: '0.5rem 0', whiteSpace: 'pre-wrap' }}>{resolvedContent}</p>
+    return <p className="my-2 whitespace-pre-wrap text-foreground">{resolvedContent}</p>
 }
 
 function TableBlockRender({ caption, columns, rows }: { caption: string; columns: string; rows: string }) {
@@ -23,15 +23,15 @@ function TableBlockRender({ caption, columns, rows }: { caption: string; columns
     const parsedRows = rows.split('\n').map((r) => r.split('|').map((c) => resolvePlaceholders(c.trim(), data)))
 
     return (
-        <div style={{ overflowX: 'auto', margin: '0.5rem 0' }}>
-            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: '0.9rem' }}>
-                {resolvedCaption ? <caption style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{resolvedCaption}</caption> : null}
+        <div className="my-2 overflow-x-auto">
+            <table className="w-full border-collapse text-[0.9rem] text-foreground">
+                {resolvedCaption ? <caption className="mb-1 font-semibold">{resolvedCaption}</caption> : null}
                 <thead>
-                    <tr>{cols.map((col) => <th key={col} style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem', background: '#f5f5f5', textAlign: 'left' }}>{col}</th>)}</tr>
+                    <tr>{cols.map((col) => <th key={col} className="border border-border bg-muted text-muted-foreground px-2.5 py-1.5 text-left">{col}</th>)}</tr>
                 </thead>
                 <tbody>
                     {parsedRows.map((row, ri) => (
-                        <tr key={ri}>{cols.map((_, ci) => <td key={ci} style={{ border: '1px solid #ccc', padding: '0.4rem 0.6rem' }}>{row[ci] ?? ''}</td>)}</tr>
+                        <tr key={ri}>{cols.map((_, ci) => <td key={ci} className="border border-border px-2.5 py-1.5">{row[ci] ?? ''}</td>)}</tr>
                     ))}
                 </tbody>
             </table>
@@ -44,9 +44,9 @@ function ImageBlockRender({ src, alt, width }: { src: string; alt: string; width
     const resolvedSrc = resolvePlaceholders(src, data)
     
     return resolvedSrc ? (
-        <img src={resolvedSrc} alt={alt} style={{ width, display: 'block', margin: '0.5rem 0' }} />
+        <img src={resolvedSrc} alt={alt} style={{ width }} className="my-2 block" />
     ) : (
-        <div style={{ width, height: 120, background: '#e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7280', fontSize: '0.85rem', margin: '0.5rem 0' }}>
+        <div style={{ width }} className="my-2 flex h-[120px] items-center justify-center bg-muted text-[0.85rem] text-muted-foreground">
             No image src
         </div>
     )
