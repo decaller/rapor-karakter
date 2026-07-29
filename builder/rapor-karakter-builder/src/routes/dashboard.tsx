@@ -170,12 +170,83 @@ function DashboardPage() {
         navigate({ search: { type: item.type, id: newId } })
     }
 
+    const handleMove = async (draggedId: string, targetId: string | null, position: 'before' | 'after' | 'inside') => {
+        if (draggedId === targetId) return
+
+        const cloneTree = (items: WorkspaceItem[]): WorkspaceItem[] => {
+            return items.map(item => ({
+                ...item,
+                children: item.children ? cloneTree(item.children) : undefined
+            }))
+        }
+        const newTree = cloneTree(tree)
+
+        let draggedItem: WorkspaceItem | undefined
+        const findAndRemove = (items: WorkspaceItem[]): boolean => {
+            const index = items.findIndex(i => i.id === draggedId)
+            if (index !== -1) {
+                draggedItem = items[index]
+                items.splice(index, 1)
+                return true
+            }
+            for (const item of items) {
+                if (item.children && findAndRemove(item.children)) return true
+            }
+            return false
+        }
+
+        const isDescendant = (item: WorkspaceItem, id: string): boolean => {
+            if (item.id === id) return true
+            if (item.children) {
+                return item.children.some(child => isDescendant(child, id))
+            }
+            return false
+        }
+
+        findAndRemove(newTree)
+        if (!draggedItem) return
+
+        if (targetId && isDescendant(draggedItem, targetId)) {
+            return
+        }
+
+        if (targetId === null) {
+            newTree.push(draggedItem)
+        } else {
+            const insertItem = (items: WorkspaceItem[]): boolean => {
+                const index = items.findIndex(i => i.id === targetId)
+                if (index !== -1) {
+                    if (position === 'inside') {
+                        const target = items[index]
+                        if (target.type === 'folder') {
+                            target.children = target.children || []
+                            target.children.push(draggedItem!)
+                        }
+                    } else if (position === 'before') {
+                        items.splice(index, 0, draggedItem!)
+                    } else if (position === 'after') {
+                        items.splice(index + 1, 0, draggedItem!)
+                    }
+                    return true
+                }
+                for (const item of items) {
+                    if (item.children && insertItem(item.children)) return true
+                }
+                return false
+            }
+            insertItem(newTree)
+        }
+
+        await updateTree(newTree)
+    }
+
     const actions = {
         onNewItem: handleNewItem,
         onNewFolder: handleNewFolder,
         onDelete: handleDelete,
         onRename: handleRename,
         onDuplicate: handleDuplicate,
+        onMove: handleMove,
     }
 
     return (

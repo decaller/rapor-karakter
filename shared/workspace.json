@@ -7,11 +7,6 @@
       "name": "Forms",
       "children": [
         {
-          "id": "form1",
-          "type": "form",
-          "name": "Absensi"
-        },
-        {
           "id": "form-1785286253343",
           "type": "form",
           "name": "Bismi"
@@ -19,9 +14,9 @@
       ]
     },
     {
-      "id": "reports-folder",
+      "id": "folder-1785287358996",
       "type": "folder",
-      "name": "Reports",
+      "name": "Project 1",
       "children": [
         {
           "id": "report1",
@@ -32,8 +27,19 @@
           "id": "report-1785286259358",
           "type": "report",
           "name": "Tes"
+        },
+        {
+          "id": "form1",
+          "type": "form",
+          "name": "Absensi"
         }
       ]
+    },
+    {
+      "id": "reports-folder",
+      "type": "folder",
+      "name": "Reports",
+      "children": []
     }
   ]
 }

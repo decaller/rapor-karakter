@@ -35,6 +35,7 @@ type ActionHandlers = {
     onDuplicate: (item: WorkspaceItem) => void
     onDelete: (item: WorkspaceItem) => void
     onRename: (item: WorkspaceItem) => void
+    onMove?: (draggedId: string, targetId: string | null, position: 'before' | 'after' | 'inside') => void
 }
 
 export function DashboardSidebar({
@@ -48,7 +49,16 @@ export function DashboardSidebar({
     return (
         <Sidebar {...props}>
             <SidebarContent>
-                <SidebarGroup>
+                <SidebarGroup
+                    onDragOver={(e) => { e.preventDefault() }}
+                    onDrop={(e) => {
+                        e.preventDefault()
+                        try {
+                            const data = JSON.parse(e.dataTransfer.getData('application/json'))
+                            if (data.id) actions.onMove?.(data.id, null, 'inside')
+                        } catch (err) {}
+                    }}
+                >
                     <SidebarGroupLabel>Workspace</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
@@ -84,12 +94,65 @@ function TreeItemNode({
     const search = useSearch({ strict: false }) as { type?: string; id?: string }
     const isActive = search.id === item.id
 
+    const [dragOverPosition, setDragOverPosition] = React.useState<'before' | 'after' | 'inside' | null>(null)
+
+    const handleDragStart = (e: React.DragEvent) => {
+        e.dataTransfer.setData('application/json', JSON.stringify({ id: item.id }))
+        e.stopPropagation()
+    }
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+        const y = e.clientY - rect.top
+        
+        if (item.type === 'folder') {
+            if (y < rect.height * 0.25) setDragOverPosition('before')
+            else if (y > rect.height * 0.75) setDragOverPosition('after')
+            else setDragOverPosition('inside')
+        } else {
+            if (y < rect.height * 0.5) setDragOverPosition('before')
+            else setDragOverPosition('after')
+        }
+    }
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        setDragOverPosition(null)
+    }
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault()
+        e.stopPropagation()
+        const pos = dragOverPosition
+        setDragOverPosition(null)
+        try {
+            const data = JSON.parse(e.dataTransfer.getData('application/json'))
+            if (data.id && data.id !== item.id && pos) {
+                actions.onMove?.(data.id, item.id, pos)
+            }
+        } catch (err) {}
+    }
+
+    const dndProps = {
+        draggable: true,
+        onDragStart: handleDragStart,
+        onDragOver: handleDragOver,
+        onDragLeave: handleDragLeave,
+        onDrop: handleDrop,
+    }
+
+    const dragClass = dragOverPosition === 'before' ? 'border-t-2 border-t-primary rounded-none' 
+                    : dragOverPosition === 'after' ? 'border-b-2 border-b-primary rounded-none'
+                    : dragOverPosition === 'inside' ? 'bg-primary/20'
+                    : ''
+
     if (item.type !== 'folder') {
         const Icon = item.type === 'form' ? FileCode2 : FileLineChart
         const ext = item.type === 'form' ? '.frm' : '.rep'
 
         return (
-            <SidebarMenuItem>
+            <SidebarMenuItem {...dndProps} className={dragClass}>
                 <ContextMenu>
                     <ContextMenuTrigger asChild>
                         <SidebarMenuButton
@@ -127,7 +190,7 @@ function TreeItemNode({
     }
 
     return (
-        <SidebarMenuItem>
+        <SidebarMenuItem {...dndProps} className={dragClass}>
             <Collapsible
                 className="group/collapsible [&[data-state=open]>div>button>svg:first-child]:rotate-90"
                 defaultOpen={true}

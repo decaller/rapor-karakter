@@ -50,12 +50,7 @@ The student/parent-facing viewer. Used to:
 ### 1. Install dependencies
 
 ```bash
-# Builder
-cd builder/rapor-karakter-builder
-npm install
-
-# Runner
-cd runner/rapor-karakter-runner
+# Run from repository root to install all dependencies (root + builder + runner)
 npm install
 ```
 
@@ -83,16 +78,13 @@ npm run db:push
 ### 4. Start dev servers
 
 ```bash
-# In one terminal — Builder
-cd builder/rapor-karakter-builder
-npm run dev        # → http://localhost:3000
+# Run both Builder (:3000) and Runner (:3001) concurrently in one terminal
+npm run dev
 
-# In another terminal — Runner
-cd runner/rapor-karakter-runner
-npm run dev        # → http://localhost:3000
+# Or run them individually:
+# npm run dev:builder  # → http://localhost:3000
+# npm run dev:runner   # → http://localhost:3001
 ```
-
-> **Note:** Both apps run on port 3000 by default. Run them in separate terminals or change one port.
 
 ---
 
