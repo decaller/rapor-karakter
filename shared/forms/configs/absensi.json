@@ -36,5 +36,5 @@
       ]
     }
   ],
-  "navigateToUrl": "http://localhost:3001/report/test-lagi?data={question1},{question2},{question4}"
+  "navigateToUrl": "http://localhost:3001/report/tes-lagi?data={question1},{question2},{question4}"
 }

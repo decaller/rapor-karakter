@@ -6,7 +6,8 @@
     "postinstall": "npm install --prefix builder/rapor-karakter-builder && npm install --prefix runner/rapor-karakter-runner",
     "dev:builder": "npm run dev --prefix builder/rapor-karakter-builder",
     "dev:runner": "npm run dev --prefix runner/rapor-karakter-runner",
-    "dev": "dotenv -e .env -- concurrently -k -n \"BUILDER,RUNNER\" -c \"cyan,magenta\" \"npm run dev:builder\" \"npm run dev:runner\""
+    "dev": "dotenv -e .env -- concurrently -k -n \"BUILDER,RUNNER\" -c \"cyan,magenta\" \"npm run dev:builder\" \"npm run dev:runner\"",
+    "db:studio": "npm run db:studio --prefix runner/rapor-karakter-runner"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

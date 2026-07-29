@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import { createServerFn } from '@tanstack/react-start'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
-import { Model } from 'survey-core'
-import { Survey } from 'survey-react-ui'
+import { db } from '#/db/index'
+import { formSubmissions } from '#/db/schema'
 
 // ---------------------------------------------------------------------------
 // Server function — load form JSON from shared directory
@@ -31,6 +31,22 @@ const loadForm = createServerFn({ method: 'GET' })
     })
 
 // ---------------------------------------------------------------------------
+// Server function — save form submission to database
+// ---------------------------------------------------------------------------
+
+const saveFormSubmission = createServerFn({ method: 'POST' })
+    .validator((data: { formId: string; reportId?: string | null; reportUrl?: string | null; payload: any }) => data)
+    .handler(async ({ data }) => {
+        await db.insert(formSubmissions).values({
+            formId: data.formId,
+            reportId: data.reportId || null,
+            reportUrl: data.reportUrl || null,
+            data: data.payload,
+        })
+        return { success: true }
+    })
+
+// ---------------------------------------------------------------------------
 // Route
 // ---------------------------------------------------------------------------
 
@@ -40,14 +56,73 @@ export const Route = createFileRoute('/form/$formId')({
 })
 
 function FormPage() {
+    const params = Route.useParams()
     const data = Route.useLoaderData()
     const [isMounted, setIsMounted] = useState(false)
+    const [SurveyUI, setSurveyUI] = useState<any>(null)
+    const [surveyModel, setSurveyModel] = useState<any>(null)
 
     useEffect(() => {
-        setIsMounted(true)
-    }, [])
+        async function init() {
+            if (!data) {
+                setIsMounted(true)
+                return
+            }
+            try {
+                const { Model } = await import('survey-core')
+                const { Survey } = await import('survey-react-ui')
+                const model = new Model(data)
+                
+                let reportId = null;
+                if (data.navigateToUrl) {
+                    try {
+                        const url = new URL(data.navigateToUrl)
+                        const parts = url.pathname.split('/')
+                        if (parts[1] === 'report' && parts[2]) {
+                            reportId = parts[2]
+                        }
+                    } catch (e) {
+                        // ignore invalid url
+                    }
+                }
 
-    if (!isMounted) {
+                model.onComplete.add(async (sender: any) => {
+                    let finalUrl = data.navigateToUrl || null
+                    if (finalUrl) {
+                        for (const key in sender.data) {
+                            const val = sender.data[key]
+                            const valStr = val !== null && val !== undefined ? String(val) : ''
+                            finalUrl = finalUrl.replace(new RegExp(`\\{${key}\\}`, 'g'), encodeURIComponent(valStr))
+                        }
+                    }
+
+                    try {
+                        await saveFormSubmission({ 
+                            data: { 
+                                formId: params.formId, 
+                                reportId: reportId,
+                                reportUrl: finalUrl,
+                                payload: sender.data 
+                            }
+                        })
+                        console.log('Form saved successfully')
+                    } catch (error) {
+                        console.error('Failed to save form:', error)
+                    }
+                })
+
+                setSurveyModel(model)
+                setSurveyUI(() => Survey)
+            } catch (e) {
+                console.error("Failed to load Survey", e)
+            } finally {
+                setIsMounted(true)
+            }
+        }
+        init()
+    }, [data, params.formId])
+
+    if (!isMounted || (data && (!SurveyUI || !surveyModel))) {
         return (
             <main className="page-wrap px-4 pt-14 pb-8 flex items-center justify-center h-[50vh]">
                 <p className="text-muted-foreground animate-pulse">Loading form...</p>
@@ -63,11 +138,9 @@ function FormPage() {
         )
     }
 
-    const surveyModel = new Model(data)
-
     return (
         <main className="page-wrap px-4 pt-14 pb-8 max-w-4xl mx-auto">
-            <Survey model={surveyModel} />
+            <SurveyUI model={surveyModel} />
         </main>
     )
 }
