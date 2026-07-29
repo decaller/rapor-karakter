@@ -27,8 +27,7 @@ const loadFormFn = createServerFn({ method: 'GET' })
                 path.dirname(new URL(import.meta.url).pathname),
                 '../../../..',
                 'shared/forms/configs',
-                formId,
-                'index.json',
+                `${formId}.json`,
             )
             const raw = await fs.readFile(filePath, 'utf-8')
             return JSON.parse(raw)
@@ -44,8 +43,7 @@ const saveFormFn = createServerFn({ method: 'POST' })
             path.dirname(new URL(import.meta.url).pathname),
             '../../../..',
             'shared/forms/configs',
-            formId,
-            'index.json',
+            `${formId}.json`,
         )
         await fs.mkdir(path.dirname(filePath), { recursive: true })
         await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8')

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ChevronRight, FileCode2, FileLineChart, Folder, Plus, Copy, Trash2, Edit2, FilePlus, FolderPlus } from 'lucide-react'
+import { ChevronRight, FileCode2, FileLineChart, Folder, Plus, Copy, Trash2, Edit2, FilePlus, FolderPlus, Link } from 'lucide-react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
     Collapsible,
@@ -35,6 +35,7 @@ type ActionHandlers = {
     onDuplicate: (item: WorkspaceItem) => void
     onDelete: (item: WorkspaceItem) => void
     onRename: (item: WorkspaceItem) => void
+    onEditSlug: (item: WorkspaceItem) => void
     onMove?: (draggedId: string, targetId: string | null, position: 'before' | 'after' | 'inside') => void
 }
 
@@ -166,12 +167,17 @@ function TreeItemNode({
                         >
                             <Icon className="w-4 h-4" />
                             <span>{item.name}</span>
-                            <span className="text-xs text-muted-foreground ml-1">{ext}</span>
+                            <span className="text-[10px] text-muted-foreground ml-2 opacity-50 truncate">
+                                {item.id}
+                            </span>
                         </SidebarMenuButton>
                     </ContextMenuTrigger>
                     <ContextMenuContent>
                         <ContextMenuItem onClick={() => actions.onRename(item)}>
                             <Edit2 className="w-4 h-4 mr-2" /> Rename
+                        </ContextMenuItem>
+                        <ContextMenuItem onClick={() => actions.onEditSlug(item)}>
+                            <Link className="w-4 h-4 mr-2" /> Edit Slug
                         </ContextMenuItem>
                         <ContextMenuItem onClick={() => actions.onDuplicate(item)}>
                             <Copy className="w-4 h-4 mr-2" /> Duplicate
@@ -221,6 +227,9 @@ function TreeItemNode({
                         <ContextMenuSeparator />
                         <ContextMenuItem onClick={() => actions.onRename(item)}>
                             <Edit2 className="w-4 h-4 mr-2" /> Rename Folder
+                        </ContextMenuItem>
+                        <ContextMenuItem onClick={() => actions.onEditSlug(item)}>
+                            <Link className="w-4 h-4 mr-2" /> Edit Slug
                         </ContextMenuItem>
                         <ContextMenuItem
                             onClick={() => actions.onDelete(item)}

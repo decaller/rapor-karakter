@@ -6,7 +6,7 @@ import { DashboardHeader } from '#/components/DashboardHeader'
 import { DashboardEmptyState } from '#/components/DashboardEmptyState'
 import { FormEditorInline } from '#/components/FormEditorInline'
 import { ReportEditorInline } from '#/components/ReportEditorInline'
-import { loadWorkspace, saveWorkspace, deleteWorkspaceItem, type WorkspaceItem } from '#/lib/workspace'
+import { loadWorkspace, saveWorkspace, deleteWorkspaceItem, renameWorkspaceFile, type WorkspaceItem } from '#/lib/workspace'
 
 export const Route = createFileRoute('/dashboard')({
     validateSearch: (search: Record<string, unknown>): { type?: 'form' | 'report'; id?: string } => {
@@ -47,11 +47,32 @@ function DashboardPage() {
         await saveWorkspace({ data: newTree })
     }
 
+    const generateSlug = (name: string, items: WorkspaceItem[]): string => {
+        let baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        if (!baseSlug) baseSlug = 'item'
+
+        const slugExists = (slug: string, treeItems: WorkspaceItem[]): boolean => {
+            for (const item of treeItems) {
+                if (item.id === slug) return true
+                if (item.children && slugExists(slug, item.children)) return true
+            }
+            return false
+        }
+
+        let slug = baseSlug
+        let counter = 1
+        while (slugExists(slug, items)) {
+            slug = `${baseSlug}-${counter}`
+            counter++
+        }
+        return slug
+    }
+
     const handleNewItem = async (itemType: 'form' | 'report', parentId?: string) => {
         const newName = prompt(`Enter new ${itemType} name:`)
         if (!newName) return
         
-        const newId = `${itemType}-${Date.now()}`
+        const newId = generateSlug(newName, tree)
         const newItem: WorkspaceItem = { id: newId, type: itemType, name: newName }
         
         const newTree = [...tree]
@@ -80,7 +101,7 @@ function DashboardPage() {
         const newName = prompt('Enter new folder name:')
         if (!newName) return
 
-        const newId = `folder-${Date.now()}`
+        const newId = generateSlug(newName, tree)
         const newFolder: WorkspaceItem = { id: newId, type: 'folder', name: newName, children: [] }
 
         const newTree = [...tree]
@@ -141,11 +162,55 @@ function DashboardPage() {
         await updateTree(newTree)
     }
 
+    const handleEditSlug = async (item: WorkspaceItem) => {
+        const newSlugInput = prompt('Enter new URL slug:', item.id)
+        if (!newSlugInput || newSlugInput === item.id) return
+
+        let newId = newSlugInput.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        if (!newId) return
+        
+        const slugExists = (slug: string, treeItems: WorkspaceItem[]): boolean => {
+            for (const i of treeItems) {
+                if (i.id === slug) return true
+                if (i.children && slugExists(slug, i.children)) return true
+            }
+            return false
+        }
+        
+        if (slugExists(newId, tree)) {
+            alert('This slug already exists. Please choose a different one.')
+            return
+        }
+
+        const updateItemId = (items: WorkspaceItem[]) => {
+            for (const i of items) {
+                if (i.id === item.id) {
+                    i.id = newId
+                    return true
+                }
+                if (i.children && updateItemId(i.children)) return true
+            }
+            return false
+        }
+
+        const newTree = [...tree]
+        updateItemId(newTree)
+        await updateTree(newTree)
+
+        if (item.type !== 'folder') {
+            await renameWorkspaceFile({ data: { type: item.type, oldId: item.id, newId } })
+        }
+
+        if (activeItem?.id === item.id) {
+            navigate({ search: { type: item.type as 'form' | 'report', id: newId } })
+        }
+    }
+
     const handleDuplicate = async (item: WorkspaceItem) => {
         if (item.type === 'folder') return // Not supported yet
 
         const newName = `${item.name} (Copy)`
-        const newId = `${item.type}-${Date.now()}`
+        const newId = generateSlug(newName, tree)
         const newItem: WorkspaceItem = { id: newId, type: item.type, name: newName }
         
         const duplicateInTree = (items: WorkspaceItem[]): boolean => {
@@ -245,6 +310,7 @@ function DashboardPage() {
         onNewFolder: handleNewFolder,
         onDelete: handleDelete,
         onRename: handleRename,
+        onEditSlug: handleEditSlug,
         onDuplicate: handleDuplicate,
         onMove: handleMove,
     }

@@ -1,5 +1,5 @@
 
-import { MoreVertical, Copy, Trash2, Edit2 } from 'lucide-react'
+import { MoreVertical, Copy, Trash2, Edit2, Link, ExternalLink } from 'lucide-react'
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -29,6 +29,7 @@ export function DashboardHeader({
         onDuplicate: (item: WorkspaceItem) => void
         onDelete: (item: WorkspaceItem) => void
         onRename: (item: WorkspaceItem) => void
+        onEditSlug: (item: WorkspaceItem) => void
     }
 }) {
     return (
@@ -59,7 +60,19 @@ export function DashboardHeader({
             </div>
 
             {activeItem && (
-                <DropdownMenu>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" asChild>
+                        <a 
+                            href={`http://localhost:${import.meta.env.VITE_RUNNER_PORT || 3001}/${activeItem.type}/${activeItem.id}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            title="Live Preview"
+                        >
+                            <ExternalLink className="w-4 h-4" />
+                            <span className="sr-only">Live Preview</span>
+                        </a>
+                    </Button>
+                    <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon">
                             <MoreVertical className="w-4 h-4" />
@@ -69,6 +82,9 @@ export function DashboardHeader({
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => actions.onRename(activeItem)}>
                             <Edit2 className="w-4 h-4 mr-2" /> Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => actions.onEditSlug(activeItem)}>
+                            <Link className="w-4 h-4 mr-2" /> Edit Slug
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => actions.onDuplicate(activeItem)}>
                             <Copy className="w-4 h-4 mr-2" /> Duplicate
@@ -82,6 +98,7 @@ export function DashboardHeader({
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
+                </div>
             )}
         </header>
     )

@@ -1,13 +1,11 @@
 {
-  "title": "Form Title",
   "pages": [
     {
       "name": "page1",
       "elements": [
         {
           "type": "text",
-          "name": "question1",
-          "title": "Name"
+          "name": "question1"
         }
       ]
     }

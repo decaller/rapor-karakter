@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "dotenv -e .env.local -- sh -c \"NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port 3001\"",
+    "dev": "dotenv -e .env.local -- sh -c \"NODE_OPTIONS='--import ./instrument.server.mjs' vite dev --port ${VITE_RUNNER_PORT:-3001}\"",
     "generate-routes": "tsr generate",
     "build": "vite build && cp instrument.server.mjs .output/server",
     "preview": "vite preview",
@@ -38,6 +38,7 @@
     "pg": "^8.16.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "survey-core": "^2.5.36",
     "survey-react-ui": "^2.5.36",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",

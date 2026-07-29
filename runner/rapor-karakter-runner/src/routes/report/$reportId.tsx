@@ -15,8 +15,7 @@ function reportPath(reportId: string) {
         path.dirname(new URL(import.meta.url).pathname),
         '../../../../..',
         'shared/reports/configs',
-        reportId,
-        'index.json',
+        `${reportId}.json`
     )
 }
 

@@ -35,7 +35,7 @@ function itemConfigPath(type: 'form' | 'report', id: string) {
     return path.resolve(
         path.dirname(new URL(import.meta.url).pathname),
         '../../../..',
-        `shared/${folder}/configs/${id}/index.json`,
+        `shared/${folder}/configs/${id}.json`,
     )
 }
 
@@ -67,11 +67,23 @@ export const deleteWorkspaceItem = createServerFn({ method: 'POST' })
     .validator((input: { id: string; type: 'form' | 'report' }) => input)
     .handler(async ({ data: { id, type } }) => {
         const filePath = itemConfigPath(type, id)
-        const dirPath = path.dirname(filePath)
         try {
-            await fs.rm(dirPath, { recursive: true, force: true })
+            await fs.unlink(filePath)
         } catch (e) {
-            console.error('Failed to delete config directory', e)
+            console.error('Failed to delete config file', e)
+        }
+        return { ok: true }
+    })
+
+export const renameWorkspaceFile = createServerFn({ method: 'POST' })
+    .validator((input: { type: 'form' | 'report', oldId: string, newId: string }) => input)
+    .handler(async ({ data: { type, oldId, newId } }) => {
+        const oldPath = itemConfigPath(type, oldId)
+        const newPath = itemConfigPath(type, newId)
+        try {
+            await fs.rename(oldPath, newPath)
+        } catch (e) {
+            console.error('Failed to rename config file', e)
         }
         return { ok: true }
     })

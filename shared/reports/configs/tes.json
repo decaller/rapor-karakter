@@ -1,0 +1,15 @@
+{
+  "root": {
+    "props": {}
+  },
+  "content": [
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "Enter text here...",
+        "id": "TextBlock-6fc775d0-4e64-4677-84d4-44355f9f695a"
+      }
+    }
+  ],
+  "zones": {}
+}

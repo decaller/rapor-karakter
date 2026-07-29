@@ -54,14 +54,24 @@ The student/parent-facing viewer. Used to:
 npm install
 ```
 
-### 2. Configure environment
+### 2. Configure environments
 
-Copy and fill in the runner's environment file:
+1. **Monorepo Root (Ports)**  
+   Create a `.env` file at the root of the project to control the ports for the local dev servers (this prevents conflicts if you have other apps running).
+   ```bash
+   cp .env.example .env
+   # Or manually create it:
+   # VITE_BUILDER_PORT=3000
+   # VITE_RUNNER_PORT=3001
+   ```
+   *Note: The builder is intended for local dev only (unless you have a license), so the ports and "Live Preview" buttons are tuned for this local environment.*
 
-```bash
-cd runner/rapor-karakter-runner
-cp .env.example .env.local
-```
+2. **Runner Database**  
+   Copy and fill in the runner's environment file:
+   ```bash
+   cd runner/rapor-karakter-runner
+   cp .env.example .env.local
+   ```
 
 Required variables:
 ```

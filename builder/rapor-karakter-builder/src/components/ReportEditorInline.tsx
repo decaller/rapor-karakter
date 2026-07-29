@@ -15,8 +15,7 @@ const loadReportFn = createServerFn({ method: 'GET' })
                 path.dirname(new URL(import.meta.url).pathname),
                 '../../../..',
                 'shared/reports/configs',
-                reportId,
-                'index.json',
+                `${reportId}.json`,
             )
             const raw = await fs.readFile(filePath, 'utf-8')
             return JSON.parse(raw) as Data
@@ -32,8 +31,7 @@ const saveReportFn = createServerFn({ method: 'POST' })
             path.dirname(new URL(import.meta.url).pathname),
             '../../../..',
             'shared/reports/configs',
-            reportId,
-            'index.json',
+            `${reportId}.json`,
         )
         await fs.mkdir(path.dirname(filePath), { recursive: true })
         await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8')
