@@ -1,5 +1,6 @@
 import _ from "lodash";
 import dayjs from "dayjs";
+import qs from "qs";
 
 // List of global variables that should be blocked from the sandbox
 const BLACKLIST = new Set([
@@ -36,6 +37,7 @@ export function createBlackHole(): any {
 const defaultLibs = {
   _: _,
   dayjs: dayjs,
+  qs: qs,
 };
 
 /**
