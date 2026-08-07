@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
-@import "survey-core/defaultV2.min.css";
+@import "survey-core/survey-core.css";
 @import "@puckeditor/core/puck.css";
 
 @import 'tw-animate-css';
@@ -302,6 +302,7 @@ a {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -317,16 +318,20 @@ a {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
     @apply bg-background text-foreground;
   }
-  
+
   /* Ensure SurveyJS column/page backgrounds respect Shadcn transparent background */
-  .sv-components-column, .sd-page, .sd-root-modern {
+  .sv-components-column,
+  .sd-page,
+  .sd-root-modern {
     background-color: transparent !important;
   }
+
   html {
     @apply font-sans;
   }
