@@ -1,7 +1,7 @@
 // Runner-side Puck config — imports schema from shared, adds React renderers.
 import { reportComponentFields } from '@shared/reports/components/puck.config'
 import type { Config } from '@puckeditor/core'
-import { useReportData, resolvePlaceholders } from './ReportContext'
+import { useReportData, resolvePlaceholders } from '@shared/reports/components/ReportContext'
 import { useSearch } from '@tanstack/react-router'
 
 function HeadingBlockRender({ text, level }: { text: string; level: string }) {

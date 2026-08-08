@@ -149,3 +149,30 @@ export const renameWorkspaceFile = createServerFn({ method: 'POST' })
         }
         return { ok: true }
     })
+
+export const getAllFlows = createServerFn({ method: 'GET' })
+    .handler(async () => {
+        try {
+            const dir = path.resolve(
+                path.dirname(new URL(import.meta.url).pathname),
+                '../../../..',
+                'shared/flows/configs'
+            )
+            const files = await fs.readdir(dir)
+            const flows: any[] = []
+            
+            for (const file of files) {
+                if (file.endsWith('.json')) {
+                    try {
+                        const raw = await fs.readFile(path.join(dir, file), 'utf-8')
+                        flows.push(JSON.parse(raw))
+                    } catch (e) {
+                        // ignore invalid files
+                    }
+                }
+            }
+            return flows
+        } catch (e) {
+            return []
+        }
+    })

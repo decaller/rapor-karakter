@@ -4,17 +4,27 @@
   },
   "content": [
     {
-      "type": "TextBlock",
+      "type": "HeadingBlock",
       "props": {
-        "content": "Enter text here... {{data}}",
-        "id": "TextBlock-04b9d84d-0251-449d-8968-69fe4ab05272"
+        "text": "Absensi Report Results",
+        "level": "1",
+        "id": "HeadingBlock-title"
       }
     },
     {
-      "type": "QueryTableBlock",
+      "type": "TextBlock",
       "props": {
-        "paramName": "data",
-        "id": "QueryTableBlock-e1c54de6-ec45-43c3-ac4c-e7d62b353441"
+        "content": "Below is the data collected from the Absensi form flow.",
+        "id": "TextBlock-subtitle"
+      }
+    },
+    {
+      "type": "TableBlock",
+      "props": {
+        "caption": "Absensi Details",
+        "columns": "Field, Result",
+        "rows": "Question 1|{{question1}}\nQuestion 2|{{question2}}\nQuestion 4|{{question4}}",
+        "id": "TableBlock-data"
       }
     }
   ],

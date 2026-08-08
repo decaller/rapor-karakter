@@ -6,7 +6,7 @@ import type { Data } from '@puckeditor/core'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { reportConfig } from '#/components/puck.config'
-import { ReportContext } from '#/components/ReportContext'
+import { ReportContext } from '@shared/reports/components/ReportContext'
 import { getSubmissionById } from '../../server/data'
 
 // ---------------------------------------------------------------------------

@@ -7,7 +7,7 @@ import path from 'node:path'
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '#/db/index'
 import { formSubmissions } from '#/db/schema'
-import { ReportContext } from '#/components/ReportContext'
+import { ReportContext } from '@shared/reports/components/ReportContext'
 import { Render } from '@puckeditor/core'
 import { reportConfig } from '#/components/puck.config'
 
@@ -41,6 +41,7 @@ const loadReport = createServerFn({ method: 'GET' })
 const saveFormSubmission = createServerFn({ method: 'POST' })
     .validator((data: { formId: string; sessionId: string; payload: any }) => data)
     .handler(async ({ data }) => {
+        console.log('=== SAVING FORM SUBMISSION ===', data)
         await db.insert(formSubmissions).values({
             formId: data.formId,
             sessionId: data.sessionId,
@@ -57,6 +58,7 @@ export const Route = createFileRoute('/flow/$flowId/step/$stepIndex')({
     validateSearch: (search: Record<string, unknown>): StepSearch => {
         return { sessionId: search?.sessionId as string | undefined }
     },
+    loaderDeps: ({ search }) => ({ sessionId: search.sessionId }),
     beforeLoad: ({ search, params }) => {
         if (!search?.sessionId) {
             // Generate a random session ID and redirect to the same URL with it
@@ -67,7 +69,7 @@ export const Route = createFileRoute('/flow/$flowId/step/$stepIndex')({
             })
         }
     },
-    loader: async ({ params, search }) => {
+    loader: async ({ params, deps }) => {
         const flow = await getFlowById({ data: params.flowId })
         if (!flow) throw new Error('Flow not found')
         
@@ -85,18 +87,19 @@ export const Route = createFileRoute('/flow/$flowId/step/$stepIndex')({
             stepData = await loadForm({ data: step.id })
         } else if (step.type === 'report') {
             stepData = await loadReport({ data: step.id })
-            if (search?.sessionId) {
-                sessionData = await getSubmissionsBySessionId({ data: search.sessionId })
+            if (deps.sessionId) {
+                sessionData = await getSubmissionsBySessionId({ data: deps.sessionId })
             }
         }
         
-        return { flow, step, stepIndex, stepData, sessionData, sessionId: search?.sessionId }
+        return { flow, step, stepIndex, stepData, sessionData }
     },
     component: FlowStepPage,
 })
 
 function FlowStepPage() {
-    const { flow, step, stepIndex, stepData, sessionData, sessionId } = Route.useLoaderData()
+    const { flow, step, stepIndex, stepData, sessionData } = Route.useLoaderData()
+    const { sessionId } = Route.useSearch()
     const router = useRouter()
 
     if (!stepData) {
@@ -120,10 +123,10 @@ function FlowStepPage() {
 
     if (step.type === 'report') {
         return (
-            <div className="flex flex-col h-screen overflow-y-auto bg-gray-50">
+            <div className="flex flex-col h-screen overflow-y-auto bg-background">
                 <main className="p-8 max-w-4xl mx-auto w-full">
                     <div className="mb-6 flex justify-between items-center">
-                        <h2 className="text-xl font-semibold text-gray-800">{flow.name} - Step {stepIndex + 1}</h2>
+                        <h2 className="text-xl font-semibold text-foreground">{flow.name} - Step {stepIndex + 1}</h2>
                         <button 
                             onClick={() => {
                                 router.navigate({
@@ -132,12 +135,12 @@ function FlowStepPage() {
                                     search: { sessionId }
                                 })
                             }}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm font-medium"
+                            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium"
                         >
                             Continue to Next Step
                         </button>
                     </div>
-                    <div className="bg-white shadow rounded-lg p-6 min-h-[500px]">
+                    <div className="bg-card text-card-foreground border border-border shadow rounded-lg p-6 min-h-[500px]">
                         <ReportContext.Provider value={sessionData || {}}>
                             <Render config={reportConfig} data={stepData} />
                         </ReportContext.Provider>

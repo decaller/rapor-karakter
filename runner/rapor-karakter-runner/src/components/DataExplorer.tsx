@@ -17,7 +17,7 @@ import { getDataRecords } from '../server/data'
 import { getAllReports } from '../server/flow'
 import { Render } from '@puckeditor/core'
 import { reportConfig } from '#/components/puck.config'
-import { ReportContext } from '#/components/ReportContext'
+import { ReportContext } from '@shared/reports/components/ReportContext'
 
 // 1. Schema Analyzer Panel Component
 function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
