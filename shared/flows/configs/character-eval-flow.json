@@ -1,0 +1,46 @@
+{
+  "id": "character-eval-flow",
+  "name": "Full Evaluation Flow",
+  "steps": [
+    {
+      "type": "form",
+      "id": "character-info-form"
+    },
+    {
+      "type": "form",
+      "id": "character-eval-form"
+    },
+    {
+      "type": "processor",
+      "id": "grade-calculator"
+    },
+    {
+      "type": "form",
+      "id": "action-plan-form"
+    },
+    {
+      "type": "report",
+      "id": "character-report-card"
+    }
+  ],
+  "testData": [
+    {
+      "_stepId": "character-eval-form",
+      "studentName": "Sample studentName",
+      "semester": "Odd Semester (Ganjil)",
+      "coreValues": "Sample coreValues",
+      "teacherNotes": "Sample teacherNotes"
+    },
+    {
+      "_stepId": "character-eval-form",
+      "studentName": "Sample studentName",
+      "semester": "Odd Semester (Ganjil)",
+      "coreValues": "Sample coreValues",
+      "teacherNotes": "Sample teacherNotes"
+    },
+    {
+      "_stepId": "action-plan-form",
+      "suggestedActionPlan": "Sample suggestedActionPlan"
+    }
+  ]
+}

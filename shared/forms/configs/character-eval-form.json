@@ -1,0 +1,53 @@
+{
+  "title": "Student Character Evaluation",
+  "description": "Please evaluate the student based on their character development over the semester.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "page1",
+      "elements": [
+        {
+          "type": "text",
+          "name": "studentName",
+          "title": "Student Name",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "semester",
+          "title": "Semester",
+          "isRequired": true,
+          "choices": [
+            "Odd Semester (Ganjil)",
+            "Even Semester (Genap)"
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "coreValues",
+          "title": "Core Values Evaluation",
+          "isRequired": true,
+          "columns": [
+            { "value": 1, "text": "Needs Improvement" },
+            { "value": 2, "text": "Below Average" },
+            { "value": 3, "text": "Average" },
+            { "value": 4, "text": "Good" },
+            { "value": 5, "text": "Excellent" }
+          ],
+          "rows": [
+            { "value": "discipline", "text": "Discipline (Kedisiplinan)" },
+            { "value": "integrity", "text": "Integrity (Integritas)" },
+            { "value": "teamwork", "text": "Teamwork (Kerjasama)" },
+            { "value": "empathy", "text": "Empathy (Empati)" }
+          ]
+        },
+        {
+          "type": "comment",
+          "name": "teacherNotes",
+          "title": "Teacher's Additional Notes",
+          "description": "Any qualitative feedback for the student?"
+        }
+      ]
+    }
+  ]
+}

@@ -86,6 +86,9 @@ export const Route = createFileRoute('/flow/$flowId/step/$stepIndex')({
 
         if (step.type === 'form') {
             stepData = await loadForm({ data: step.id })
+            if (deps.sessionId) {
+                sessionData = await getSubmissionsBySessionId({ data: deps.sessionId })
+            }
         } else if (step.type === 'report') {
             stepData = await loadReport({ data: step.id })
             if (deps.sessionId) {
@@ -112,6 +115,7 @@ function FlowStepPage() {
     if (step.type === 'form') {
         return <FlowFormStep 
             formData={stepData} 
+            sessionData={sessionData || {}}
             formId={step.id} 
             sessionId={sessionId!} 
             onComplete={() => {
@@ -170,7 +174,7 @@ function FlowStepPage() {
     return <div>Unknown step type</div>
 }
 
-function FlowFormStep({ formData, formId, sessionId, onComplete }: { formData: any, formId: string, sessionId: string, onComplete: () => void }) {
+function FlowFormStep({ formData, sessionData, formId, sessionId, onComplete }: { formData: any, sessionData: any, formId: string, sessionId: string, onComplete: () => void }) {
     const [isMounted, setIsMounted] = useState(false)
     const [SurveyUI, setSurveyUI] = useState<any>(null)
     const [surveyModel, setSurveyModel] = useState<any>(null)
@@ -181,6 +185,23 @@ function FlowFormStep({ formData, formId, sessionId, onComplete }: { formData: a
                 const { Model } = await import('survey-core')
                 const { Survey } = await import('survey-react-ui')
                 const model = new Model(formData)
+                
+                // Prefill form data from previous steps
+                if (sessionData && Object.keys(sessionData).length > 0) {
+                    const flattenObject = (obj: any, prefix = '') => {
+                        return Object.keys(obj).reduce((acc: any, k) => {
+                            const pre = prefix.length ? prefix + '.' : '';
+                            if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                                Object.assign(acc, flattenObject(obj[k], pre + k));
+                            } else {
+                                acc[pre + k] = obj[k];
+                            }
+                            return acc;
+                        }, {});
+                    };
+                    const flatData = flattenObject(sessionData);
+                    model.data = { ...sessionData, ...flatData };
+                }
                 
                 // apply basic theme...
                 model.applyTheme({ themeName: "shadcn", colorPalette: "dark", isPanelless: false, cssVariables: { "--sjs-base-unit": "8px" } })

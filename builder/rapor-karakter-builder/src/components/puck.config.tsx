@@ -91,6 +91,36 @@ function QueryTableBlockRender({ paramName }: { paramName: string }) {
     )
 }
 
+function PdfExportBlockRender({ buttonText }: { buttonText: string }) {
+    return (
+        <div style={{ margin: '1rem 0' }}>
+            <button 
+                onClick={() => window.print()}
+                className="pdf-export-btn"
+                style={{
+                    padding: '0.5rem 1rem',
+                    backgroundColor: '#173a40',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    fontWeight: 500
+                }}
+            >
+                {buttonText}
+            </button>
+            <style>{`
+                @media print {
+                    .pdf-export-btn {
+                        display: none !important;
+                    }
+                }
+            `}</style>
+        </div>
+    )
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const reportConfig: Config = {
     components: {
@@ -99,5 +129,6 @@ export const reportConfig: Config = {
         TableBlock: { ...reportComponentFields.TableBlock, render: TableBlockRender as any },
         ImageBlock: { ...reportComponentFields.ImageBlock, render: ImageBlockRender as any },
         QueryTableBlock: { ...reportComponentFields.QueryTableBlock, render: QueryTableBlockRender as any },
+        PdfExportBlock: { ...reportComponentFields.PdfExportBlock, render: PdfExportBlockRender as any },
     },
 }

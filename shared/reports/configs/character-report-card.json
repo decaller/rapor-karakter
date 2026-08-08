@@ -1,0 +1,86 @@
+{
+  "root": {
+    "props": {
+      "title": "Character Report Card"
+    }
+  },
+  "content": [
+    {
+      "type": "HeadingBlock",
+      "props": {
+        "text": "Character Report Card: {{studentName}}",
+        "level": "1",
+        "id": "HeadingBlock-1"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "Semester: {{semester}}",
+        "id": "TextBlock-1"
+      }
+    },
+    {
+      "type": "HeadingBlock",
+      "props": {
+        "text": "Overall Evaluation",
+        "level": "2",
+        "id": "HeadingBlock-2"
+      }
+    },
+    {
+      "type": "TableBlock",
+      "props": {
+        "caption": "Summary of Evaluation",
+        "columns": "Average Score, Letter Grade",
+        "rows": "{{evaluationResult.averageScore}}|{{evaluationResult.letterGrade}}",
+        "id": "TableBlock-1"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "{{evaluationResult.summarySentence}}",
+        "id": "TextBlock-2"
+      }
+    },
+    {
+      "type": "HeadingBlock",
+      "props": {
+        "text": "Teacher's Notes",
+        "level": "2",
+        "id": "HeadingBlock-3"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "{{teacherNotes}}",
+        "id": "TextBlock-3"
+      }
+    },
+    {
+      "type": "HeadingBlock",
+      "props": {
+        "text": "Action Plan",
+        "level": "2",
+        "id": "HeadingBlock-4"
+      }
+    },
+    {
+      "type": "TextBlock",
+      "props": {
+        "content": "{{evaluationResult.suggestedActionPlan}}",
+        "id": "TextBlock-4"
+      }
+    },
+    {
+      "type": "PdfExportBlock",
+      "props": {
+        "buttonText": "Download Report as PDF",
+        "id": "PdfExportBlock-1"
+      }
+    }
+  ],
+  "zones": {}
+}

@@ -68,6 +68,43 @@
       "id": "porces",
       "type": "processor",
       "name": "porces"
+    },
+    {
+      "id": "character-eval-folder",
+      "type": "folder",
+      "name": "Character Evaluation",
+      "children": [
+        {
+          "id": "character-eval-flow",
+          "type": "flow",
+          "name": "Full Evaluation Flow"
+        },
+        {
+          "id": "character-info-form",
+          "type": "form",
+          "name": "Step 1: Info Form"
+        },
+        {
+          "id": "character-eval-form",
+          "type": "form",
+          "name": "Evaluation Form"
+        },
+        {
+          "id": "grade-calculator",
+          "type": "processor",
+          "name": "Grade Calculator"
+        },
+        {
+          "id": "character-report-card",
+          "type": "report",
+          "name": "Report Card"
+        },
+        {
+          "id": "action-plan-form",
+          "type": "form",
+          "name": "Action Plan Form"
+        }
+      ]
     }
   ]
 }

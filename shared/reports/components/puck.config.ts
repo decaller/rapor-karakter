@@ -48,4 +48,10 @@ export const reportComponentFields = {
         },
         defaultProps: { paramName: 'data' },
     },
+    PdfExportBlock: {
+        fields: {
+            buttonText: { type: 'text' as const },
+        },
+        defaultProps: { buttonText: 'Download as PDF' },
+    },
 } as const
