@@ -5,7 +5,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
 type FlowStep = {
-    type: 'form' | 'report'
+    type: 'form' | 'report' | 'processor'
     id: string
 }
 
@@ -111,11 +111,13 @@ const saveFlowFn = createServerFn({ method: 'POST' })
 export function FlowEditorInline({ flowId, tree }: { flowId: string, tree: any[] }) {
     const forms: any[] = []
     const reports: any[] = []
+    const processors: any[] = []
     
     const extractItems = (items: any[]) => {
         for (const item of items) {
             if (item.type === 'form') forms.push(item)
             if (item.type === 'report') reports.push(item)
+            if (item.type === 'processor') processors.push(item)
             if (item.children) extractItems(item.children)
         }
     }
@@ -202,13 +204,14 @@ export function FlowEditorInline({ flowId, tree }: { flowId: string, tree: any[]
                                         value={step.type}
                                         onChange={(e) => {
                                             const newSteps = [...data.steps]
-                                            newSteps[index].type = e.target.value as 'form' | 'report'
+                                            newSteps[index].type = e.target.value as 'form' | 'report' | 'processor'
                                             setData({ ...data, steps: newSteps })
                                         }}
                                         className="border border-border rounded p-2 text-sm bg-background text-foreground"
                                     >
                                         <option value="form">Form</option>
                                         <option value="report">Report</option>
+                                        <option value="processor">Processor</option>
                                     </select>
                                     <select 
                                         value={step.id} 
@@ -220,7 +223,7 @@ export function FlowEditorInline({ flowId, tree }: { flowId: string, tree: any[]
                                         className="border border-border rounded p-2 text-sm flex-1 bg-background text-foreground"
                                     >
                                         <option value="" disabled>Select {step.type}...</option>
-                                        {(step.type === 'form' ? forms : reports).map(item => (
+                                        {(step.type === 'form' ? forms : step.type === 'report' ? reports : processors).map(item => (
                                             <option key={item.id} value={item.id}>{item.name} ({item.id})</option>
                                         ))}
                                     </select>

@@ -7,12 +7,13 @@ import { DashboardEmptyState } from '#/components/DashboardEmptyState'
 import { FormEditorInline } from '#/components/FormEditorInline'
 import { ReportEditorInline } from '#/components/ReportEditorInline'
 import { FlowEditorInline } from '#/components/FlowEditorInline'
+import { ProcessorEditorInline } from '#/components/ProcessorEditorInline'
 import { loadWorkspace, saveWorkspace, deleteWorkspaceItem, renameWorkspaceFile, type WorkspaceItem } from '#/lib/workspace'
 
 export const Route = createFileRoute('/dashboard')({
-    validateSearch: (search: Record<string, unknown>): { type?: 'form' | 'report' | 'flow'; id?: string } => {
+    validateSearch: (search: Record<string, unknown>): { type?: 'form' | 'report' | 'flow' | 'processor'; id?: string } => {
         return {
-            type: search.type as 'form' | 'report' | 'flow' | undefined,
+            type: search.type as 'form' | 'report' | 'flow' | 'processor' | undefined,
             id: search.id as string | undefined,
         }
     },
@@ -34,7 +35,7 @@ export const Route = createFileRoute('/dashboard')({
             }
             const item = findItem(loaderData.tree, search.id);
             if (item) {
-                title = `${item.name} - ${search.type === 'form' ? 'Form' : 'Report'} Builder`;
+                title = `${item.name} - ${search.type === 'form' ? 'Form' : search.type === 'report' ? 'Report' : search.type === 'processor' ? 'Processor' : 'Flow'} Builder`;
             }
         }
         return {
@@ -91,7 +92,7 @@ function DashboardPage() {
         return slug
     }
 
-    const handleNewItem = async (itemType: 'form' | 'report' | 'flow', parentId?: string) => {
+    const handleNewItem = async (itemType: 'form' | 'report' | 'flow' | 'processor', parentId?: string) => {
         const newName = prompt(`Enter new ${itemType} name:`)
         if (!newName) return
         
@@ -107,7 +108,7 @@ function DashboardPage() {
                 newTree.push(newItem)
             }
         } else {
-            const folderId = itemType === 'form' ? 'forms-folder' : itemType === 'report' ? 'reports-folder' : 'flows-folder'
+            const folderId = itemType === 'form' ? 'forms-folder' : itemType === 'report' ? 'reports-folder' : itemType === 'processor' ? 'processors-folder' : 'flows-folder'
             const folder = findItem(newTree, folderId)
             if (folder && folder.type === 'folder') {
                 folder.children = [...(folder.children || []), newItem]
@@ -225,7 +226,7 @@ function DashboardPage() {
         }
 
         if (activeItem?.id === item.id) {
-            navigate({ search: { type: item.type as 'form' | 'report' | 'flow', id: newId } })
+            navigate({ search: { type: item.type as 'form' | 'report' | 'flow' | 'processor', id: newId } })
         }
     }
 
@@ -350,6 +351,8 @@ function DashboardPage() {
                         <FlowEditorInline key={id} flowId={id} tree={tree} />
                     ) : type === 'form' ? (
                         <FormEditorInline key={id} formId={id} />
+                    ) : type === 'processor' ? (
+                        <ProcessorEditorInline key={id} processorId={id} />
                     ) : (
                         <ReportEditorInline key={id} reportId={id} />
                     )}

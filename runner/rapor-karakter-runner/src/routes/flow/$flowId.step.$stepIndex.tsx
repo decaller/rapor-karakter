@@ -5,6 +5,7 @@ import { getSubmissionsBySessionId } from '#/server/data'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { createServerFn } from '@tanstack/react-start'
+import { executeProcessorStep } from '#/server/processor'
 import { db } from '#/db/index'
 import { formSubmissions } from '#/db/schema'
 import { ReportContext } from '@shared/reports/components/ReportContext'
@@ -90,6 +91,8 @@ export const Route = createFileRoute('/flow/$flowId/step/$stepIndex')({
             if (deps.sessionId) {
                 sessionData = await getSubmissionsBySessionId({ data: deps.sessionId })
             }
+        } else if (step.type === 'processor') {
+            stepData = { id: step.id }
         }
         
         return { flow, step, stepIndex, stepData, sessionData }
@@ -135,7 +138,7 @@ function FlowStepPage() {
                                     search: { sessionId }
                                 })
                             }}
-                            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium"
+                            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 text-sm font-medium"
                         >
                             Continue to Next Step
                         </button>
@@ -148,6 +151,20 @@ function FlowStepPage() {
                 </main>
             </div>
         )
+    }
+    
+    if (step.type === 'processor') {
+        return <FlowProcessorStep 
+            processorId={step.id} 
+            sessionId={sessionId!} 
+            onComplete={() => {
+                router.navigate({
+                    to: '/flow/$flowId/step/$stepIndex',
+                    params: { flowId: flow.id, stepIndex: String(stepIndex + 1) },
+                    search: { sessionId }
+                })
+            }} 
+        />
     }
 
     return <div>Unknown step type</div>
@@ -198,5 +215,47 @@ function FlowFormStep({ formData, formId, sessionId, onComplete }: { formData: a
         <main className="page-wrap px-4 pt-14 pb-8 max-w-4xl mx-auto">
             <SurveyUI model={surveyModel} />
         </main>
+    )
+}
+
+function FlowProcessorStep({ processorId, sessionId, onComplete }: { processorId: string, sessionId: string, onComplete: () => void }) {
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        let mounted = true
+        executeProcessorStep({ data: { processorId, sessionId } })
+            .then(() => {
+                if (mounted) onComplete()
+            })
+            .catch((err) => {
+                console.error('Processor failed:', err)
+                if (mounted) setError(err.message)
+            })
+        return () => { mounted = false }
+    }, [processorId, sessionId, onComplete])
+
+    if (error) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-12 bg-background">
+                <div className="text-destructive mb-4">Error executing processor: {error}</div>
+                <button 
+                    onClick={() => onComplete()}
+                    className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm"
+                >
+                    Skip and Continue
+                </button>
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex flex-col h-screen overflow-y-auto bg-background">
+            <main className="p-12 max-w-4xl mx-auto w-full flex flex-col items-center justify-center">
+                <div className="animate-pulse flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-muted-foreground font-medium">Processing Data...</p>
+                </div>
+            </main>
+        </div>
     )
 }

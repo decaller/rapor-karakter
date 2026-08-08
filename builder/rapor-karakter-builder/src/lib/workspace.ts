@@ -8,7 +8,7 @@ import path from 'node:path'
 
 export type WorkspaceItem = {
     id: string
-    type: 'form' | 'report' | 'flow' | 'folder'
+    type: 'form' | 'report' | 'flow' | 'processor' | 'folder'
     name: string
     children?: WorkspaceItem[]
 }
@@ -30,8 +30,8 @@ function workspacePath() {
     )
 }
 
-function itemConfigPath(type: 'form' | 'report' | 'flow', id: string) {
-    const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : 'flows'
+function itemConfigPath(type: 'form' | 'report' | 'flow' | 'processor', id: string) {
+    const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : type === 'processor' ? 'processors' : 'flows'
     return path.resolve(
         path.dirname(new URL(import.meta.url).pathname),
         '../../../..',
@@ -55,7 +55,7 @@ export const loadWorkspace = createServerFn({ method: 'GET' })
 
         // Ensure directories exist and read them to sync any untracked files
         const baseDir = path.dirname(workspacePath())
-        const types: ('form' | 'report' | 'flow')[] = ['form', 'report', 'flow']
+        const types: ('form' | 'report' | 'flow' | 'processor')[] = ['form', 'report', 'flow', 'processor']
         
         let modified = false
         const allIds = new Set<string>()
@@ -69,7 +69,7 @@ export const loadWorkspace = createServerFn({ method: 'GET' })
         extractIds(config.tree)
 
         for (const type of types) {
-            const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : 'flows'
+            const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : type === 'processor' ? 'processors' : 'flows'
             const configsPath = path.resolve(baseDir, `${folder}/configs`)
             
             try {
@@ -81,13 +81,13 @@ export const loadWorkspace = createServerFn({ method: 'GET' })
                         const id = file.replace('.json', '')
                         if (!allIds.has(`${type}:${id}`)) {
                             // Find or create default folder
-                            const folderId = type === 'form' ? 'forms-folder' : type === 'report' ? 'reports-folder' : 'flows-folder'
+                            const folderId = type === 'form' ? 'forms-folder' : type === 'report' ? 'reports-folder' : type === 'processor' ? 'processors-folder' : 'flows-folder'
                             let targetFolder = config.tree.find(i => i.id === folderId)
                             if (!targetFolder) {
                                 targetFolder = {
                                     id: folderId,
                                     type: 'folder',
-                                    name: type === 'form' ? 'Forms' : type === 'report' ? 'Reports' : 'Flows',
+                                    name: type === 'form' ? 'Forms' : type === 'report' ? 'Reports' : type === 'processor' ? 'Processors' : 'Flows',
                                     children: []
                                 }
                                 config.tree.push(targetFolder)
@@ -126,7 +126,7 @@ export const saveWorkspace = createServerFn({ method: 'POST' })
     })
 
 export const deleteWorkspaceItem = createServerFn({ method: 'POST' })
-    .validator((input: { id: string; type: 'form' | 'report' | 'flow' }) => input)
+    .validator((input: { id: string; type: 'form' | 'report' | 'flow' | 'processor' }) => input)
     .handler(async ({ data: { id, type } }) => {
         const filePath = itemConfigPath(type, id)
         try {
@@ -138,7 +138,7 @@ export const deleteWorkspaceItem = createServerFn({ method: 'POST' })
     })
 
 export const renameWorkspaceFile = createServerFn({ method: 'POST' })
-    .validator((input: { type: 'form' | 'report' | 'flow', oldId: string, newId: string }) => input)
+    .validator((input: { type: 'form' | 'report' | 'flow' | 'processor', oldId: string, newId: string }) => input)
     .handler(async ({ data: { type, oldId, newId } }) => {
         const oldPath = itemConfigPath(type, oldId)
         const newPath = itemConfigPath(type, newId)

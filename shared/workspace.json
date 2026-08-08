@@ -63,6 +63,11 @@
           "name": "absensi-flow"
         }
       ]
+    },
+    {
+      "id": "porces",
+      "type": "processor",
+      "name": "porces"
     }
   ]
 }
