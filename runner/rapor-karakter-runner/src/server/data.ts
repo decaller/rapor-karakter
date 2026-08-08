@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { db } from '../db/index'
 import { formSubmissions } from '../db/schema'
-import { isNotNull } from 'drizzle-orm'
+import { isNotNull, eq } from 'drizzle-orm'
 
 function profileFields(documents: any[]) {
   const fieldStats: Record<string, { count: number; types: Record<string, number> }> = {}
@@ -47,20 +47,86 @@ function profileFields(documents: any[]) {
 
 export const getDataRecords = createServerFn({ method: 'GET' })
   .handler(async () => {
-    // 1. Fetch a safe sample using Drizzle
-    const sampleSubmissions = await db
+    // 1. Fetch submissions using Drizzle
+    const submissions = await db
       .select()
       .from(formSubmissions)
       .where(isNotNull(formSubmissions.data))
       .limit(1000)
 
-    const documents = sampleSubmissions.map((s) => s.data)
+    // 2. Group by sessionId
+    const sessionMap = new Map<string, any>()
+    
+    for (const sub of submissions) {
+      const sId = sub.sessionId || `legacy_${sub.id}` // Fallback for old records without sessionId
+      if (!sessionMap.has(sId)) {
+        sessionMap.set(sId, {
+          id: sId, // Use sessionId as the table ID
+          sessionId: sId,
+          createdAt: sub.createdAt,
+          formCount: 0,
+          data: {}
+        })
+      }
+      
+      const session = sessionMap.get(sId)
+      session.formCount += 1
+      
+      if (sub.data && typeof sub.data === 'object') {
+        session.data = { ...session.data, ...sub.data }
+      }
+      
+      // Use the earliest createdAt
+      if (sub.createdAt && session.createdAt && sub.createdAt < session.createdAt) {
+        session.createdAt = sub.createdAt
+      }
+    }
 
-    // 2. Run the analysis algorithms from the guide
+    const sessionRecords = Array.from(sessionMap.values())
+    // Sort by newest first
+    sessionRecords.sort((a, b) => {
+      if (!a.createdAt || !b.createdAt) return 0
+      return b.createdAt.getTime() - a.createdAt.getTime()
+    })
+
+    const documents = sessionRecords.map((s) => s.data)
+
+    // 3. Run the analysis algorithms on the merged session data
     const schemaProfile = profileFields(documents)
 
     return {
-      records: sampleSubmissions,
+      records: sessionRecords,
       schemaProfile,
     }
+  })
+
+export const getSubmissionById = createServerFn({ method: 'GET' })
+  .validator((id: number) => id)
+  .handler(async ({ data: id }) => {
+    const [submission] = await db
+      .select()
+      .from(formSubmissions)
+      .where(eq(formSubmissions.id, id))
+      .limit(1)
+    
+    return submission?.data || null
+  })
+
+export const getSubmissionsBySessionId = createServerFn({ method: 'GET' })
+  .validator((sessionId: string) => sessionId)
+  .handler(async ({ data: sessionId }) => {
+    const submissions = await db
+      .select()
+      .from(formSubmissions)
+      .where(eq(formSubmissions.sessionId, sessionId))
+      
+    // Merge all JSON payloads from this session into a single object
+    const mergedData = submissions.reduce((acc, sub) => {
+      if (sub.data && typeof sub.data === 'object') {
+        return { ...acc, ...sub.data }
+      }
+      return acc
+    }, {} as Record<string, unknown>)
+    
+    return mergedData
   })

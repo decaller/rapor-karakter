@@ -8,7 +8,7 @@ import path from 'node:path'
 
 export type WorkspaceItem = {
     id: string
-    type: 'form' | 'report' | 'folder'
+    type: 'form' | 'report' | 'flow' | 'folder'
     name: string
     children?: WorkspaceItem[]
 }
@@ -30,8 +30,8 @@ function workspacePath() {
     )
 }
 
-function itemConfigPath(type: 'form' | 'report', id: string) {
-    const folder = type === 'form' ? 'forms' : 'reports'
+function itemConfigPath(type: 'form' | 'report' | 'flow', id: string) {
+    const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : 'flows'
     return path.resolve(
         path.dirname(new URL(import.meta.url).pathname),
         '../../../..',
@@ -45,12 +45,74 @@ function itemConfigPath(type: 'form' | 'report', id: string) {
 
 export const loadWorkspace = createServerFn({ method: 'GET' })
     .handler(async () => {
+        let config: WorkspaceConfig = { version: 1, tree: [] }
         try {
             const raw = await fs.readFile(workspacePath(), 'utf-8')
-            return JSON.parse(raw) as WorkspaceConfig
+            config = JSON.parse(raw) as WorkspaceConfig
         } catch {
-            return { version: 1, tree: [] }
+            // keep default
         }
+
+        // Ensure directories exist and read them to sync any untracked files
+        const baseDir = path.dirname(workspacePath())
+        const types: ('form' | 'report' | 'flow')[] = ['form', 'report', 'flow']
+        
+        let modified = false
+        const allIds = new Set<string>()
+        
+        const extractIds = (items: WorkspaceItem[]) => {
+            for (const item of items) {
+                if (item.type !== 'folder') allIds.add(`${item.type}:${item.id}`)
+                if (item.children) extractIds(item.children)
+            }
+        }
+        extractIds(config.tree)
+
+        for (const type of types) {
+            const folder = type === 'form' ? 'forms' : type === 'report' ? 'reports' : 'flows'
+            const configsPath = path.resolve(baseDir, `${folder}/configs`)
+            
+            try {
+                await fs.mkdir(configsPath, { recursive: true })
+                const files = await fs.readdir(configsPath)
+                
+                for (const file of files) {
+                    if (file.endsWith('.json')) {
+                        const id = file.replace('.json', '')
+                        if (!allIds.has(`${type}:${id}`)) {
+                            // Find or create default folder
+                            const folderId = type === 'form' ? 'forms-folder' : type === 'report' ? 'reports-folder' : 'flows-folder'
+                            let targetFolder = config.tree.find(i => i.id === folderId)
+                            if (!targetFolder) {
+                                targetFolder = {
+                                    id: folderId,
+                                    type: 'folder',
+                                    name: type === 'form' ? 'Forms' : type === 'report' ? 'Reports' : 'Flows',
+                                    children: []
+                                }
+                                config.tree.push(targetFolder)
+                            }
+                            targetFolder.children = targetFolder.children || []
+                            targetFolder.children.push({
+                                id,
+                                type,
+                                name: id
+                            })
+                            allIds.add(`${type}:${id}`)
+                            modified = true
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(`Failed to read ${configsPath}`, err)
+            }
+        }
+        
+        if (modified) {
+            await fs.writeFile(workspacePath(), JSON.stringify(config, null, 2), 'utf-8')
+        }
+
+        return config
     })
 
 export const saveWorkspace = createServerFn({ method: 'POST' })
@@ -64,7 +126,7 @@ export const saveWorkspace = createServerFn({ method: 'POST' })
     })
 
 export const deleteWorkspaceItem = createServerFn({ method: 'POST' })
-    .validator((input: { id: string; type: 'form' | 'report' }) => input)
+    .validator((input: { id: string; type: 'form' | 'report' | 'flow' }) => input)
     .handler(async ({ data: { id, type } }) => {
         const filePath = itemConfigPath(type, id)
         try {
@@ -76,7 +138,7 @@ export const deleteWorkspaceItem = createServerFn({ method: 'POST' })
     })
 
 export const renameWorkspaceFile = createServerFn({ method: 'POST' })
-    .validator((input: { type: 'form' | 'report', oldId: string, newId: string }) => input)
+    .validator((input: { type: 'form' | 'report' | 'flow', oldId: string, newId: string }) => input)
     .handler(async ({ data: { type, oldId, newId } }) => {
         const oldPath = itemConfigPath(type, oldId)
         const newPath = itemConfigPath(type, newId)

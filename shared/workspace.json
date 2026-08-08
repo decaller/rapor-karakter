@@ -36,6 +36,11 @@
       "name": "ahmad",
       "children": [
         {
+          "id": "tes-absen",
+          "type": "flow",
+          "name": "tes absen"
+        },
+        {
           "id": "absensi",
           "type": "form",
           "name": "Absensi"
@@ -48,10 +53,16 @@
       ]
     },
     {
-      "id": "reports-folder",
+      "id": "flows-folder",
       "type": "folder",
-      "name": "Reports",
-      "children": []
+      "name": "Flows",
+      "children": [
+        {
+          "id": "absensi-flow",
+          "type": "flow",
+          "name": "absensi-flow"
+        }
+      ]
     }
   ]
 }

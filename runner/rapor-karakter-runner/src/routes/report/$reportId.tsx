@@ -7,6 +7,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { reportConfig } from '#/components/puck.config'
 import { ReportContext } from '#/components/ReportContext'
+import { getSubmissionById } from '../../server/data'
 
 // ---------------------------------------------------------------------------
 // Server function — load report JSON from shared directory
@@ -37,11 +38,28 @@ const loadReport = createServerFn({ method: 'GET' })
 // ---------------------------------------------------------------------------
 
 export const Route = createFileRoute('/report/$reportId')({
-    loader: ({ params }) => loadReport({ data: params.reportId }),
+    validateSearch: (search: Record<string, unknown>) => {
+        return {
+            submissionId: search.submissionId as string | undefined,
+            ...search,
+        }
+    },
+    loaderDeps: ({ search }) => ({ submissionId: search.submissionId }),
+    loader: async ({ params, deps }) => {
+        const config = await loadReport({ data: params.reportId })
+        let submissionData = null
+        if (deps.submissionId) {
+            const idInt = parseInt(deps.submissionId, 10)
+            if (!isNaN(idInt)) {
+                submissionData = await getSubmissionById({ data: idInt })
+            }
+        }
+        return { config, submissionData }
+    },
     head: ({ loaderData, params }) => {
         let title = `Report ${params.reportId} | Runner`
-        if (loaderData?.root?.props?.title) {
-            title = `${loaderData.root.props.title} | Runner`
+        if (loaderData?.config?.root?.props?.title) {
+            title = `${loaderData.config.root.props.title} | Runner`
         }
         return {
             meta: [{ title }]
@@ -51,7 +69,7 @@ export const Route = createFileRoute('/report/$reportId')({
 })
 
 function ReportPage() {
-    const data = Route.useLoaderData()
+    const { config, submissionData } = Route.useLoaderData()
     const search = Route.useSearch({ strict: false }) as Record<string, unknown>
     const [isMounted, setIsMounted] = useState(false)
 
@@ -67,7 +85,7 @@ function ReportPage() {
         )
     }
 
-    if (!data) {
+    if (!config) {
         return (
             <main className="page-wrap px-4 pt-14 pb-8">
                 <p className="text-[var(--sea-ink-soft)]">Report not found.</p>
@@ -75,10 +93,12 @@ function ReportPage() {
         )
     }
 
+    const mergedData = { ...search, ...(submissionData || {}) }
+
     return (
-        <ReportContext.Provider value={search}>
+        <ReportContext.Provider value={mergedData}>
             <main className="page-wrap px-4 pt-14 pb-8">
-                <Render config={reportConfig} data={data} />
+                <Render config={reportConfig} data={config} />
             </main>
         </ReportContext.Provider>
     )

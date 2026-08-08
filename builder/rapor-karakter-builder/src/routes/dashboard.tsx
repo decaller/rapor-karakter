@@ -6,12 +6,13 @@ import { DashboardHeader } from '#/components/DashboardHeader'
 import { DashboardEmptyState } from '#/components/DashboardEmptyState'
 import { FormEditorInline } from '#/components/FormEditorInline'
 import { ReportEditorInline } from '#/components/ReportEditorInline'
+import { FlowEditorInline } from '#/components/FlowEditorInline'
 import { loadWorkspace, saveWorkspace, deleteWorkspaceItem, renameWorkspaceFile, type WorkspaceItem } from '#/lib/workspace'
 
 export const Route = createFileRoute('/dashboard')({
-    validateSearch: (search: Record<string, unknown>): { type?: 'form' | 'report'; id?: string } => {
+    validateSearch: (search: Record<string, unknown>): { type?: 'form' | 'report' | 'flow'; id?: string } => {
         return {
-            type: search.type as 'form' | 'report' | undefined,
+            type: search.type as 'form' | 'report' | 'flow' | undefined,
             id: search.id as string | undefined,
         }
     },
@@ -90,7 +91,7 @@ function DashboardPage() {
         return slug
     }
 
-    const handleNewItem = async (itemType: 'form' | 'report', parentId?: string) => {
+    const handleNewItem = async (itemType: 'form' | 'report' | 'flow', parentId?: string) => {
         const newName = prompt(`Enter new ${itemType} name:`)
         if (!newName) return
         
@@ -106,7 +107,7 @@ function DashboardPage() {
                 newTree.push(newItem)
             }
         } else {
-            const folderId = itemType === 'form' ? 'forms-folder' : 'reports-folder'
+            const folderId = itemType === 'form' ? 'forms-folder' : itemType === 'report' ? 'reports-folder' : 'flows-folder'
             const folder = findItem(newTree, folderId)
             if (folder && folder.type === 'folder') {
                 folder.children = [...(folder.children || []), newItem]
@@ -224,7 +225,7 @@ function DashboardPage() {
         }
 
         if (activeItem?.id === item.id) {
-            navigate({ search: { type: item.type as 'form' | 'report', id: newId } })
+            navigate({ search: { type: item.type as 'form' | 'report' | 'flow', id: newId } })
         }
     }
 
@@ -345,6 +346,8 @@ function DashboardPage() {
                 <div className="flex-1 flex flex-col relative overflow-hidden bg-muted/10">
                     {!type || !id ? (
                         <DashboardEmptyState />
+                    ) : type === 'flow' ? (
+                        <FlowEditorInline key={id} flowId={id} tree={tree} />
                     ) : type === 'form' ? (
                         <FormEditorInline key={id} formId={id} />
                     ) : (

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ChevronRight, FileCode2, FileLineChart, Folder, Plus, Copy, Trash2, Edit2, FilePlus, FolderPlus, Link } from 'lucide-react'
+import { ChevronRight, FileCode2, FileLineChart, Folder, Plus, Copy, Trash2, Edit2, FilePlus, FolderPlus, Link, Workflow } from 'lucide-react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import {
     Collapsible,
@@ -31,7 +31,7 @@ import { Button } from '@/components/ui/button'
 
 type ActionHandlers = {
     onNewFolder: (parentId?: string) => void
-    onNewItem: (type: 'form' | 'report', parentId?: string) => void
+    onNewItem: (type: 'form' | 'report' | 'flow', parentId?: string) => void
     onDuplicate: (item: WorkspaceItem) => void
     onDelete: (item: WorkspaceItem) => void
     onRename: (item: WorkspaceItem) => void
@@ -71,13 +71,18 @@ export function DashboardSidebar({
                 </SidebarGroup>
             </SidebarContent>
             <SidebarRail />
-            <SidebarFooter className="p-4 flex flex-row gap-2">
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => actions.onNewItem('form')}>
-                    <Plus className="w-4 h-4 mr-1" /> Form
+            <SidebarFooter className="p-4 flex flex-col gap-2">
+                <Button variant="outline" size="sm" className="w-full bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700 hover:text-white" onClick={() => actions.onNewItem('flow')}>
+                    <Plus className="w-4 h-4 mr-1" /> Flow
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1" onClick={() => actions.onNewItem('report')}>
-                    <Plus className="w-4 h-4 mr-1" /> Report
-                </Button>
+                <div className="flex flex-row gap-2">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => actions.onNewItem('form')}>
+                        <Plus className="w-4 h-4 mr-1" /> Form
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => actions.onNewItem('report')}>
+                        <Plus className="w-4 h-4 mr-1" /> Report
+                    </Button>
+                </div>
             </SidebarFooter>
         </Sidebar>
     )
@@ -149,8 +154,8 @@ function TreeItemNode({
                     : ''
 
     if (item.type !== 'folder') {
-        const Icon = item.type === 'form' ? FileCode2 : FileLineChart
-        const ext = item.type === 'form' ? '.frm' : '.rep'
+        const Icon = item.type === 'form' ? FileCode2 : item.type === 'report' ? FileLineChart : Workflow
+        const ext = item.type === 'form' ? '.frm' : item.type === 'report' ? '.rep' : '.flw'
 
         return (
             <SidebarMenuItem {...dndProps} className={dragClass}>
@@ -161,7 +166,7 @@ function TreeItemNode({
                             onClick={() =>
                                 navigate({
                                     to: '/dashboard',
-                                    search: { type: item.type as 'form' | 'report', id: item.id },
+                                    search: { type: item.type as 'form' | 'report' | 'flow', id: item.id },
                                 })
                             }
                         >
@@ -219,6 +224,9 @@ function TreeItemNode({
                         </ContextMenuItem>
                         <ContextMenuItem onClick={() => actions.onNewItem('report', item.id)}>
                             <FilePlus className="w-4 h-4 mr-2" /> New Report
+                        </ContextMenuItem>
+                        <ContextMenuItem onClick={() => actions.onNewItem('flow', item.id)}>
+                            <Workflow className="w-4 h-4 mr-2" /> New Flow
                         </ContextMenuItem>
                         <ContextMenuSeparator />
                         <ContextMenuItem onClick={() => actions.onNewFolder(item.id)}>

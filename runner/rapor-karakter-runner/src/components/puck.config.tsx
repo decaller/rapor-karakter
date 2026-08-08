@@ -54,8 +54,8 @@ function ImageBlockRender({ src, alt, width }: { src: string; alt: string; width
 }
 
 function QueryTableBlockRender({ paramName }: { paramName: string }) {
-    const search: any = useSearch({ strict: false })
-    const rawValue = search?.[paramName]
+    const data = useReportData()
+    const rawValue = data?.[paramName]
 
     if (!rawValue || typeof rawValue !== 'string') {
         return (

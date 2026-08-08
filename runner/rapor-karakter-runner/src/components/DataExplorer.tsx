@@ -14,6 +14,10 @@ import {
   ResizablePanelGroup,
 } from '#/components/ui/resizable'
 import { getDataRecords } from '../server/data'
+import { getAllReports } from '../server/flow'
+import { Render } from '@puckeditor/core'
+import { reportConfig } from '#/components/puck.config'
+import { ReportContext } from '#/components/ReportContext'
 
 // 1. Schema Analyzer Panel Component
 function SchemaAnalyzer({ schemaProfile, hiddenColumns, toggleColumn }: any) {
@@ -64,8 +68,12 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
 
   const columns = useMemo(() => {
     const baseCols = [
-      columnHelper.accessor('id', { header: 'ID', size: 60 }),
-      columnHelper.accessor('formId', { header: 'Form ID' }),
+      columnHelper.accessor('sessionId', { header: 'Session ID', size: 120 }),
+      columnHelper.accessor('createdAt', { 
+        header: 'Created At',
+        cell: (info) => info.getValue() ? new Date(info.getValue()).toLocaleString() : '-',
+      }),
+      columnHelper.accessor('formCount', { header: 'Forms' }),
     ]
 
     const dynamicCols = schemaProfile
@@ -136,45 +144,68 @@ function JsonbTable({ data, schemaProfile, hiddenColumns, onRowClick, selectedRo
 
 // 3. Report Preview Panel Component
 function ReportPreview({ selectedRecord }: any) {
+  const { data: reports, isLoading } = useQuery({
+    queryKey: ['reports'],
+    queryFn: () => getAllReports(),
+  })
+  const [selectedReportId, setSelectedReportId] = useState<string>('')
+
+  useMemo(() => {
+    if (reports && reports.length > 0 && !selectedReportId) {
+      setSelectedReportId(reports[0].id)
+    }
+  }, [reports, selectedReportId])
+
   if (!selectedRecord) {
     return (
       <div className="flex h-full items-center justify-center p-6 text-center text-muted-foreground">
-        <p>Select a row to preview the full report data.</p>
+        <p>Select a session to preview the generated report.</p>
       </div>
     )
   }
 
+  const selectedReport = reports?.find(r => r.id === selectedReportId)
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="p-4 border-b border-border bg-background sticky top-0 z-10 flex justify-between items-center">
-        <h3 className="font-semibold text-sm text-foreground">
-          Report Preview
-        </h3>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground font-mono">ID: {selectedRecord.id}</span>
-          {selectedRecord.reportUrl && (
-            <a
-              href={selectedRecord.reportUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs bg-muted hover:bg-muted-foreground/20 text-foreground px-2 py-1 rounded transition-colors border border-border"
-            >
-              <ExternalLink className="w-3 h-3" />
-              Open
-            </a>
-          )}
+      <div className="p-4 border-b border-border bg-background sticky top-0 z-10 flex flex-col gap-3 shadow-sm">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold text-sm text-foreground">
+            Report Preview
+          </h3>
+          <span className="text-xs text-muted-foreground font-mono truncate max-w-[200px]" title={selectedRecord.sessionId}>
+            {selectedRecord.sessionId}
+          </span>
         </div>
+        
+        {isLoading ? (
+          <div className="text-xs text-muted-foreground flex items-center gap-2">
+            <Loader2 className="w-3 h-3 animate-spin" /> Loading reports...
+          </div>
+        ) : reports && reports.length > 0 ? (
+          <select 
+            value={selectedReportId} 
+            onChange={e => setSelectedReportId(e.target.value)}
+            className="w-full border border-border rounded p-1.5 text-xs bg-muted text-foreground outline-none focus:ring-1 focus:ring-ring"
+          >
+            {reports.map((r: any) => (
+              <option key={r.id} value={r.id}>{r.name}</option>
+            ))}
+          </select>
+        ) : (
+          <div className="text-xs text-muted-foreground">No reports available</div>
+        )}
       </div>
-      <div className="flex-1 overflow-hidden relative bg-muted/20">
-        {selectedRecord.reportUrl ? (
-          <iframe
-            src={selectedRecord.reportUrl}
-            className="absolute inset-0 w-full h-full border-0"
-            title={`Report ${selectedRecord.id}`}
-          />
+      <div className="flex-1 overflow-y-auto bg-muted/20 p-4">
+        {selectedReport ? (
+          <div className="bg-background shadow-sm border border-border rounded-lg p-6 min-h-[500px] overflow-hidden">
+            <ReportContext.Provider value={selectedRecord.data || {}}>
+                <Render config={reportConfig} data={selectedReport.config} />
+            </ReportContext.Provider>
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center p-6 text-center text-muted-foreground">
-            <p>No report URL available for this record.</p>
+            <p>Select a report to preview.</p>
           </div>
         )}
       </div>

@@ -10,18 +10,32 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as FlowIndexRouteImport } from './routes/flow/index'
 import { Route as FormFormIdRouteImport } from './routes/form/$formId'
 import { Route as ReportReportIdRouteImport } from './routes/report/$reportId'
+import { Route as FlowFlowIdIndexRouteImport } from './routes/flow/$flowId.index'
+import { Route as FlowFlowIdStepStepIndexRouteImport } from './routes/flow/$flowId.step.$stepIndex'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowIndexRoute = FlowIndexRouteImport.update({
+  id: '/flow/',
+  path: '/flow/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FormFormIdRoute = FormFormIdRouteImport.update({
@@ -34,39 +48,90 @@ const ReportReportIdRoute = ReportReportIdRouteImport.update({
   path: '/report/$reportId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FlowFlowIdIndexRoute = FlowFlowIdIndexRouteImport.update({
+  id: '/flow/$flowId/',
+  path: '/flow/$flowId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowFlowIdStepStepIndexRoute = FlowFlowIdStepStepIndexRouteImport.update({
+  id: '/flow/$flowId/step/$stepIndex',
+  path: '/flow/$flowId/step/$stepIndex',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
+  '/flow/': typeof FlowIndexRoute
+  '/flow/$flowId/': typeof FlowFlowIdIndexRoute
+  '/flow/$flowId/step/$stepIndex': typeof FlowFlowIdStepStepIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
+  '/flow': typeof FlowIndexRoute
+  '/flow/$flowId': typeof FlowFlowIdIndexRoute
+  '/flow/$flowId/step/$stepIndex': typeof FlowFlowIdStepStepIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/form/$formId': typeof FormFormIdRoute
   '/report/$reportId': typeof ReportReportIdRoute
+  '/flow/': typeof FlowIndexRoute
+  '/flow/$flowId/': typeof FlowFlowIdIndexRoute
+  '/flow/$flowId/step/$stepIndex': typeof FlowFlowIdStepStepIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/dashboard'
+    | '/form/$formId'
+    | '/report/$reportId'
+    | '/flow/'
+    | '/flow/$flowId/'
+    | '/flow/$flowId/step/$stepIndex'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
-  id: '__root__' | '/' | '/dashboard' | '/form/$formId' | '/report/$reportId'
+  to:
+    | '/'
+    | '/admin'
+    | '/dashboard'
+    | '/form/$formId'
+    | '/report/$reportId'
+    | '/flow'
+    | '/flow/$flowId'
+    | '/flow/$flowId/step/$stepIndex'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/dashboard'
+    | '/form/$formId'
+    | '/report/$reportId'
+    | '/flow/'
+    | '/flow/$flowId/'
+    | '/flow/$flowId/step/$stepIndex'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   FormFormIdRoute: typeof FormFormIdRoute
   ReportReportIdRoute: typeof ReportReportIdRoute
+  FlowIndexRoute: typeof FlowIndexRoute
+  FlowFlowIdIndexRoute: typeof FlowFlowIdIndexRoute
+  FlowFlowIdStepStepIndexRoute: typeof FlowFlowIdStepStepIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -78,11 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flow/': {
+      id: '/flow/'
+      path: '/flow'
+      fullPath: '/flow/'
+      preLoaderRoute: typeof FlowIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/form/$formId': {
@@ -99,14 +178,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/flow/$flowId/': {
+      id: '/flow/$flowId/'
+      path: '/flow/$flowId'
+      fullPath: '/flow/$flowId/'
+      preLoaderRoute: typeof FlowFlowIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flow/$flowId/step/$stepIndex': {
+      id: '/flow/$flowId/step/$stepIndex'
+      path: '/flow/$flowId/step/$stepIndex'
+      fullPath: '/flow/$flowId/step/$stepIndex'
+      preLoaderRoute: typeof FlowFlowIdStepStepIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   FormFormIdRoute: FormFormIdRoute,
   ReportReportIdRoute: ReportReportIdRoute,
+  FlowIndexRoute: FlowIndexRoute,
+  FlowFlowIdIndexRoute: FlowFlowIdIndexRoute,
+  FlowFlowIdStepStepIndexRoute: FlowFlowIdStepStepIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

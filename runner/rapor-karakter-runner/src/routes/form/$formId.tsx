@@ -35,15 +35,16 @@ const loadForm = createServerFn({ method: 'GET' })
 // ---------------------------------------------------------------------------
 
 const saveFormSubmission = createServerFn({ method: 'POST' })
-    .validator((data: { formId: string; reportId?: string | null; reportUrl?: string | null; payload: any }) => data)
+    .validator((data: { formId: string; sessionId?: string | null; reportId?: string | null; reportUrl?: string | null; payload: any }) => data)
     .handler(async ({ data }) => {
-        await db.insert(formSubmissions).values({
+        const [inserted] = await db.insert(formSubmissions).values({
             formId: data.formId,
+            sessionId: data.sessionId || null,
             reportId: data.reportId || null,
             reportUrl: data.reportUrl || null,
             data: data.payload,
-        })
-        return { success: true }
+        }).returning({ id: formSubmissions.id })
+        return { success: true, submissionId: inserted.id }
     })
 
 // ---------------------------------------------------------------------------
@@ -132,10 +133,14 @@ function FormPage() {
                     model.applyTheme(shadcnSurveyTheme)
                 }
 
+                // Prevent SurveyJS from redirecting natively so we can wait for the DB save
+                let originalNavigateToUrl = data.navigateToUrl;
+                model.navigateToUrl = "";
+
                 let reportId = null;
-                if (data.navigateToUrl) {
+                if (originalNavigateToUrl) {
                     try {
-                        const url = new URL(data.navigateToUrl)
+                        const url = new URL(originalNavigateToUrl, window.location.origin)
                         const parts = url.pathname.split('/')
                         if (parts[1] === 'report' && parts[2]) {
                             reportId = parts[2]
@@ -146,7 +151,7 @@ function FormPage() {
                 }
 
                 model.onComplete.add(async (sender: any) => {
-                    let finalUrl = data.navigateToUrl || null
+                    let finalUrl = originalNavigateToUrl || null
                     if (finalUrl) {
                         for (const key in sender.data) {
                             const val = sender.data[key]
@@ -156,7 +161,7 @@ function FormPage() {
                     }
 
                     try {
-                        await saveFormSubmission({ 
+                        const result = await saveFormSubmission({ 
                             data: { 
                                 formId: params.formId, 
                                 reportId: reportId,
@@ -165,6 +170,23 @@ function FormPage() {
                             }
                         })
                         console.log('Form saved successfully')
+
+                        if (finalUrl && result.submissionId) {
+                            try {
+                                const urlObj = new URL(finalUrl, window.location.origin);
+                                const newParams = new URLSearchParams();
+                                newParams.set('submissionId', String(result.submissionId));
+                                for (const [key, value] of urlObj.searchParams.entries()) {
+                                    if (key !== 'submissionId') {
+                                        newParams.append(key, value);
+                                    }
+                                }
+                                urlObj.search = newParams.toString();
+                                window.location.href = urlObj.toString();
+                            } catch (e) {
+                                window.location.href = finalUrl;
+                            }
+                        }
                     } catch (error) {
                         console.error('Failed to save form:', error)
                     }

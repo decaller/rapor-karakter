@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "dotenv -e .env.local -- sh -c \"vite dev --port ${VITE_RUNNER_PORT:-3001}\"",
+    "dev": "dotenv -e .env.local -- sh -c \"vite dev --host --port ${VITE_RUNNER_PORT:-3001}\"",
     "generate-routes": "tsr generate",
     "build": "vite build",
     "preview": "vite preview",

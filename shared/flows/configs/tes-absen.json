@@ -1,0 +1,32 @@
+{
+  "id": "tes-absen",
+  "name": "tes-absen",
+  "steps": [
+    {
+      "type": "form",
+      "id": "dengan"
+    },
+    {
+      "type": "form",
+      "id": "absensi"
+    },
+    {
+      "type": "report",
+      "id": "tes-lagi"
+    }
+  ],
+  "testData": [
+    {
+      "_stepId": "dengan",
+      "question1": "Sample Answer"
+    },
+    {
+      "_stepId": "absensi",
+      "question1": "Sample question1",
+      "question4": "Item 1",
+      "question2": [
+        "Item 1"
+      ]
+    }
+  ]
+}

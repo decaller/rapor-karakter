@@ -95,7 +95,26 @@ export function FormEditorInline({ formId }: { formId: string }) {
             }
             newCreator.JSON = json
             newCreator.saveSurveyFunc = (saveNo: number, callback: (no: number, isSuccess: boolean) => void) => {
-                saveFormFn({ data: { formId, data: newCreator.JSON } })
+                const surveyData = newCreator.JSON;
+
+                // Automate passing data to the navigateToUrl
+                if (surveyData.navigateToUrl) {
+                    try {
+                        const questions = newCreator.survey.getAllQuestions();
+                        const queryParts = questions.map((q: any) => `${encodeURIComponent(q.name)}={${q.name}}`);
+                        
+                        if (queryParts.length > 0) {
+                            const baseUrl = surveyData.navigateToUrl.split('?')[0];
+                            surveyData.navigateToUrl = `${baseUrl}?${queryParts.join('&')}`;
+                            // Update the creator UI
+                            newCreator.JSON = surveyData;
+                        }
+                    } catch (error) {
+                        console.error('Failed to parse and update navigateToUrl', error);
+                    }
+                }
+
+                saveFormFn({ data: { formId, data: surveyData } })
                     .then(() => callback(saveNo, true))
                     .catch(() => callback(saveNo, false))
             }

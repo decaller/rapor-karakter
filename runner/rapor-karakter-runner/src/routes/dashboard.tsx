@@ -32,7 +32,7 @@ export const Route = createFileRoute('/dashboard')({
     const { isAuthenticated } = await checkAuth()
     if (!isAuthenticated) {
       throw redirect({
-        to: '/',
+        to: '/admin',
       })
     }
   },

@@ -1,0 +1,24 @@
+{
+  "id": "absensi-flow",
+  "name": "Absensi Workflow (MVP)",
+  "steps": [
+    {
+      "type": "form",
+      "id": "absensi"
+    },
+    {
+      "type": "report",
+      "id": "tes-lagi"
+    }
+  ],
+  "testData": [
+    {
+      "_stepId": "absensi",
+      "question1": "Sample question1",
+      "question4": "Item 1",
+      "question2": [
+        "Item 1"
+      ]
+    }
+  ]
+}

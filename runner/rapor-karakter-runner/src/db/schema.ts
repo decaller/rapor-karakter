@@ -9,6 +9,7 @@ export const todos = pgTable('todos', {
 export const formSubmissions = pgTable('form_submissions', {
   id: serial().primaryKey(),
   formId: text('form_id').notNull(),
+  sessionId: text('session_id'),
   reportId: text('report_id'),
   reportUrl: text('report_url'),
   data: jsonb('data').notNull(),
